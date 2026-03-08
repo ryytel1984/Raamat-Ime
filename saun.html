@@ -488,9 +488,15 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const saunaRef = doc(db, "sauna", "log");
 
-// ── 2025 HISTORICAL DATA ──
+// ── 2025 HISTORICAL DATA (112 sauna — 5 jaanuari kodus + 1 jaanuari Ott kuupäevadeta, ligikaudsed)
 const DATA_2025 = [
-  // KODUS
+  // KODUS — jaanuar (5 kuupäevata, ligikaudsed)
+  {date:"2025-01-03",type:"home",location:"",beers:0},
+  {date:"2025-01-07",type:"home",location:"",beers:0},
+  {date:"2025-01-11",type:"home",location:"",beers:0},
+  {date:"2025-01-15",type:"home",location:"",beers:0},
+  {date:"2025-01-18",type:"home",location:"",beers:0},
+  // KODUS — kuupäevadega
   {date:"2025-01-19",type:"home",location:"",beers:0},
   {date:"2025-01-23",type:"home",location:"",beers:0},
   {date:"2025-01-26",type:"home",location:"",beers:0},
@@ -500,8 +506,8 @@ const DATA_2025 = [
   {date:"2025-02-12",type:"home",location:"",beers:0},
   {date:"2025-02-21",type:"home",location:"",beers:0},
   {date:"2025-03-06",type:"home",location:"",beers:0},
-  {date:"2025-03-13",type:"home",location:"",beers:0},
   {date:"2025-03-09",type:"home",location:"",beers:0},
+  {date:"2025-03-13",type:"home",location:"",beers:0},
   {date:"2025-03-16",type:"home",location:"",beers:0},
   {date:"2025-03-17",type:"home",location:"",beers:0},
   {date:"2025-03-23",type:"home",location:"",beers:0},
@@ -521,8 +527,7 @@ const DATA_2025 = [
   {date:"2025-05-29",type:"home",location:"",beers:0},
   {date:"2025-06-01",type:"home",location:"",beers:0},
   {date:"2025-06-05",type:"home",location:"",beers:0},
-  {date:"2025-07-17",type:"home",location:"",beers:0},
-  {date:"2025-06-13",type:"home",location:"",beers:0},
+  {date:"2025-06-17",type:"home",location:"",beers:0},
   {date:"2025-07-05",type:"home",location:"",beers:0},
   {date:"2025-07-13",type:"home",location:"",beers:0},
   {date:"2025-07-22",type:"home",location:"",beers:0},
@@ -557,7 +562,9 @@ const DATA_2025 = [
   {date:"2025-12-20",type:"home",location:"",beers:0},
   {date:"2025-12-28",type:"home",location:"",beers:0},
   {date:"2025-12-30",type:"home",location:"",beers:0},
-  // VÕÕRSIL
+  // VÕÕRSIL — jaanuar (kuupäevata, ligikaudne)
+  {date:"2025-01-10",type:"away",location:"Ott",beers:0},
+  // VÕÕRSIL — kuupäevadega
   {date:"2025-02-06",type:"away",location:"Vend",beers:0},
   {date:"2025-02-08",type:"away",location:"Juhan",beers:0},
   {date:"2025-02-16",type:"away",location:"Ott",beers:0},
@@ -599,8 +606,6 @@ const DATA_2025 = [
   {date:"2025-12-11",type:"away",location:"Madis",beers:0},
   {date:"2025-12-21",type:"away",location:"Viimsi spa",beers:0},
   {date:"2025-12-25",type:"away",location:"Hilton",beers:0},
-  // Ott in jan
-  {date:"2025-01-01",type:"away",location:"Ott",beers:0},
 ];
 
 // ── 2026 INITIAL DATA (from your notes) ──
