@@ -15,281 +15,102 @@
     --dark: #073B4C;
     --card: #FFFFFF;
     --shadow: 0 8px 32px rgba(7,59,76,0.12);
+    --fire: #FF9500;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   body {
     font-family: 'Nunito', sans-serif;
     background: var(--bg);
     min-height: 100vh;
     padding: 20px;
-    background-image: 
+    background-image:
       radial-gradient(circle at 10% 20%, rgba(255,107,53,0.08) 0%, transparent 50%),
       radial-gradient(circle at 90% 80%, rgba(6,214,160,0.08) 0%, transparent 50%);
   }
-
-  h1 {
-    font-family: 'Fredoka One', cursive;
-    font-size: clamp(2rem, 5vw, 3.2rem);
-    color: var(--primary);
-    text-align: center;
-    margin-bottom: 6px;
-    letter-spacing: 1px;
-  }
-
-  .subtitle {
-    text-align: center;
-    color: var(--dark);
-    font-size: 1rem;
-    opacity: 0.7;
-    margin-bottom: 28px;
-  }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    max-width: 900px;
-    margin: 0 auto;
-  }
-
-  .card {
-    background: var(--card);
-    border-radius: 24px;
-    padding: 24px;
-    box-shadow: var(--shadow);
-    border: 3px solid transparent;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
+  h1 { font-family: 'Fredoka One', cursive; font-size: clamp(2rem,5vw,3.2rem); color: var(--primary); text-align: center; margin-bottom: 6px; }
+  .subtitle { text-align: center; color: var(--dark); font-size: 1rem; opacity: 0.7; margin-bottom: 6px; }
+  .sync-status { text-align: center; font-size: 0.8rem; color: #999; margin-bottom: 20px; min-height: 18px; }
+  .sync-ok { color: var(--accent); }
+  .sync-err { color: var(--primary); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 900px; margin: 0 auto; }
+  .card { background: var(--card); border-radius: 24px; padding: 24px; box-shadow: var(--shadow); border: 3px solid transparent; transition: transform 0.2s, box-shadow 0.2s; }
   .card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(7,59,76,0.16); }
-
-  .card-title {
-    font-family: 'Fredoka One', cursive;
-    font-size: 1.1rem;
-    color: var(--dark);
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  /* Input section */
+  .card-title { font-family: 'Fredoka One', cursive; font-size: 1.1rem; color: var(--dark); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
   .input-card { border-color: var(--secondary); grid-column: 1 / -1; }
-
-  .input-row {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-
-  .page-input {
-    font-family: 'Fredoka One', cursive;
-    font-size: 3rem;
-    width: 140px;
-    text-align: center;
-    border: 3px solid var(--secondary);
-    border-radius: 16px;
-    padding: 10px;
-    color: var(--dark);
-    background: #FFFBF0;
-    outline: none;
-    transition: border-color 0.2s;
-  }
+  .input-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .page-input { font-family: 'Fredoka One', cursive; font-size: 3rem; width: 140px; text-align: center; border: 3px solid var(--secondary); border-radius: 16px; padding: 10px; color: var(--dark); background: #FFFBF0; outline: none; transition: border-color 0.2s; }
   .page-input:focus { border-color: var(--primary); }
-
-  .input-label {
-    font-size: 1.1rem;
-    color: var(--dark);
-    font-weight: 700;
-    flex: 1;
-    min-width: 150px;
-  }
-
-  .btn {
-    font-family: 'Fredoka One', cursive;
-    font-size: 1.2rem;
-    padding: 14px 28px;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 0.5px;
-  }
+  .input-label { font-size: 1.1rem; color: var(--dark); font-weight: 700; flex: 1; min-width: 150px; }
+  .btn { font-family: 'Fredoka One', cursive; font-size: 1.2rem; padding: 14px 28px; border: none; border-radius: 50px; cursor: pointer; transition: all 0.2s; }
   .btn:hover { transform: scale(1.05); }
   .btn:active { transform: scale(0.97); }
-
   .btn-primary { background: var(--primary); color: white; }
-  .btn-accent { background: var(--accent); color: white; }
-  .btn-small {
-    font-size: 0.9rem;
-    padding: 8px 16px;
-    background: #f0f0f0;
-    color: var(--dark);
-  }
-
-  /* Progress bar */
-  .progress-wrap {
-    background: #f0f0f0;
-    border-radius: 50px;
-    height: 28px;
-    overflow: hidden;
-    position: relative;
-  }
-  .progress-fill {
-    height: 100%;
-    border-radius: 50px;
-    background: linear-gradient(90deg, var(--accent), var(--blue));
-    transition: width 0.8s cubic-bezier(.34,1.56,.64,1);
-    position: relative;
-  }
-  .progress-fill::after {
-    content: '';
-    position: absolute;
-    top: 6px; right: 8px;
-    width: 12px; height: 12px;
-    background: rgba(255,255,255,0.5);
-    border-radius: 50%;
-    animation: shimmer 1.5s infinite;
-  }
-  @keyframes shimmer { 0%,100%{opacity:0.5} 50%{opacity:1} }
-
-  .progress-label {
-    font-family: 'Fredoka One', cursive;
-    font-size: 2.5rem;
-    color: var(--dark);
-    margin-bottom: 8px;
-  }
-
-  /* Stats */
-  .stat-big {
-    font-family: 'Fredoka One', cursive;
-    font-size: 2.8rem;
-    line-height: 1;
-    margin-bottom: 4px;
-  }
+  .btn-small { font-size: 0.9rem; padding: 8px 16px; background: #f0f0f0; color: var(--dark); }
+  .progress-wrap { background: #f0f0f0; border-radius: 50px; height: 28px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 50px; background: linear-gradient(90deg, var(--accent), var(--blue)); transition: width 0.8s cubic-bezier(.34,1.56,.64,1); }
+  .progress-label { font-family: 'Fredoka One', cursive; font-size: 2.5rem; color: var(--dark); margin-bottom: 8px; }
+  .stat-big { font-family: 'Fredoka One', cursive; font-size: 2.8rem; line-height: 1; margin-bottom: 4px; }
   .stat-desc { font-size: 0.9rem; color: #666; font-weight: 600; }
-
-  /* Today goal highlight */
   .today-card { border-color: var(--primary); background: linear-gradient(135deg, #fff5f0, #fff); }
   .today-card .stat-big { color: var(--primary); }
+  .days-left { font-family: 'Fredoka One', cursive; font-size: 1.3rem; color: var(--blue); }
+  .full-width { grid-column: 1 / -1; }
 
-  /* Streak */
-  .streak-card { border-color: var(--secondary); }
-  .streak-card .stat-big { color: var(--blue); }
+  /* STREAK */
+  .streak-card { border-color: var(--fire); background: linear-gradient(135deg, #fff9f0, #fff); }
+  .streak-number { font-family: 'Fredoka One', cursive; font-size: 4.5rem; line-height: 1; color: var(--fire); display: flex; align-items: center; gap: 8px; }
+  .flame { font-size: 4rem; animation: flicker 1.2s ease-in-out infinite alternate; display: inline-block; }
+  @keyframes flicker { from{transform:scale(1) rotate(-3deg)} to{transform:scale(1.12) rotate(3deg)} }
+  .streak-dead .streak-number { color: #ccc; }
+  .streak-dead .flame { animation: none; filter: grayscale(1); }
 
-  /* Stars / badges */
-  .badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 10px;
-  }
-  .badge {
-    font-size: 0.85rem;
-    font-weight: 700;
-    padding: 6px 14px;
-    border-radius: 50px;
-    opacity: 0.35;
-    transition: all 0.3s;
-    border: 2px solid transparent;
-  }
-  .badge.earned {
-    opacity: 1;
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  }
-  .badge-bronze { background: #FFE0B2; color: #E65100; border-color: #FFB74D; }
-  .badge-silver { background: #E3F2FD; color: #0D47A1; border-color: #90CAF9; }
-  .badge-gold { background: #FFFDE7; color: #F57F17; border-color: #FFD54F; }
-  .badge-diamond { background: linear-gradient(135deg,#E8EAF6,#E1F5FE); color: #4527A0; border-color: #B39DDB; }
+  .streak-dots { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .streak-dot { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 800; flex-direction: column; gap: 1px; transition: all 0.3s; }
+  .streak-dot.done { background: var(--fire); color: white; box-shadow: 0 3px 10px rgba(255,149,0,0.4); }
+  .streak-dot.today-pending { background: white; border: 3px dashed var(--fire); color: var(--fire); }
+  .streak-dot.missed { background: #f0f0f0; color: #ccc; }
+  .dot-day { font-size: 0.6rem; }
 
-  /* Reading log */
-  .log-list {
-    list-style: none;
-    max-height: 180px;
-    overflow-y: auto;
-    padding-right: 4px;
-  }
+  .milestone-wrap { margin-top: 16px; }
+  .milestone-label { font-size: 0.85rem; font-weight: 800; color: #888; margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .milestone-bar-bg { background: #f0f0f0; border-radius: 50px; height: 16px; overflow: hidden; }
+  .milestone-bar-fill { height: 100%; border-radius: 50px; background: linear-gradient(90deg, #FF6B00, #FFD166); transition: width 0.7s cubic-bezier(.34,1.56,.64,1); }
+
+  /* Badges */
+  .badges { display: flex; gap: 12px; flex-wrap: wrap; }
+  .badge-item { display: flex; flex-direction: column; align-items: center; gap: 5px; opacity: 0.25; filter: grayscale(1); transition: all 0.4s; }
+  .badge-item.earned { opacity: 1; filter: none; }
+  .badge-icon { font-size: 2.4rem; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border: 3px solid #e0e0e0; transition: all 0.4s; }
+  .badge-item.earned .badge-icon { background: linear-gradient(135deg, #fff3e0, #ffe0b2); border-color: var(--fire); box-shadow: 0 4px 16px rgba(255,149,0,0.35); animation: popBadge 0.5s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes popBadge { from{transform:scale(0.5)} to{transform:scale(1)} }
+  .badge-label { font-size: 0.78rem; font-weight: 800; color: #aaa; }
+  .badge-item.earned .badge-label { color: var(--fire); }
+
+  /* Log */
+  .log-list { list-style: none; max-height: 180px; overflow-y: auto; padding-right: 4px; }
   .log-list::-webkit-scrollbar { width: 6px; }
-  .log-list::-webkit-scrollbar-track { background: #f0f0f0; border-radius: 10px; }
   .log-list::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 10px; }
-
-  .log-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 12px;
-    border-radius: 12px;
-    margin-bottom: 6px;
-    background: #f9f9f9;
-    font-size: 0.9rem;
-    animation: slideIn 0.3s ease;
-  }
+  .log-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-radius: 12px; margin-bottom: 6px; background: #f9f9f9; font-size: 0.9rem; animation: slideIn 0.3s ease; }
   .log-item .log-date { color: #999; font-size: 0.8rem; }
   .log-item .log-pages { font-family: 'Fredoka One', cursive; color: var(--primary); font-size: 1.1rem; }
-
   @keyframes slideIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
 
-  /* Motivational message */
-  .motive-box {
-    background: linear-gradient(135deg, var(--secondary), #FFEC8B);
-    border-radius: 16px;
-    padding: 16px 20px;
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: var(--dark);
-    text-align: center;
-    margin-top: 16px;
-    min-height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    grid-column: 1 / -1;
-    box-shadow: 0 4px 16px rgba(255,209,102,0.4);
-    transition: all 0.4s;
-  }
+  .motive-box { background: linear-gradient(135deg, var(--secondary), #FFEC8B); border-radius: 16px; padding: 18px 24px; font-size: 1.1rem; font-weight: 700; color: var(--dark); text-align: center; min-height: 60px; display: flex; align-items: center; justify-content: center; grid-column: 1 / -1; box-shadow: 0 4px 16px rgba(255,209,102,0.4); }
 
-  /* Countdown */
-  .days-left {
-    font-family: 'Fredoka One', cursive;
-    font-size: 1.3rem;
-    color: var(--blue);
-  }
-
-  /* Celebration overlay */
-  #celebrate {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-  }
+  #celebrate { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 100; align-items: center; justify-content: center; }
   #celebrate.show { display: flex; }
-  .celebrate-box {
-    background: white;
-    border-radius: 32px;
-    padding: 48px 40px;
-    text-align: center;
-    max-width: 360px;
-    animation: popIn 0.4s cubic-bezier(.34,1.56,.64,1);
-  }
-  @keyframes popIn { from{opacity:0;transform:scale(0.5)} to{opacity:1;transform:scale(1)} }
+  .celebrate-box { background: white; border-radius: 32px; padding: 48px 40px; text-align: center; max-width: 360px; animation: popIn 0.4s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes popIn { from{opacity:0;transform:scale(0.4)} to{opacity:1;transform:scale(1)} }
   .celebrate-emoji { font-size: 5rem; margin-bottom: 12px; }
   .celebrate-text { font-family: 'Fredoka One', cursive; font-size: 1.8rem; color: var(--primary); margin-bottom: 8px; }
   .celebrate-sub { font-size: 1rem; color: #666; margin-bottom: 24px; }
-
-  .full-width { grid-column: 1 / -1; }
 </style>
 </head>
 <body>
 
 <h1>📚 Minu Raamat</h1>
 <p class="subtitle">323 lehekülge · tähtaeg 3. aprill 2026</p>
+<div class="sync-status" id="syncStatus">⏳ Ühendun...</div>
 
 <div class="grid">
 
@@ -298,59 +119,91 @@
     <div class="card-title">✏️ Sisesta tänased lehed</div>
     <div class="input-row">
       <input class="page-input" type="number" id="pageInput" placeholder="0" min="0" max="323">
-      <div class="input-label">loetud lehekülge <br><small style="opacity:0.6;font-size:0.85rem">kokku raamatu algusest</small></div>
+      <div class="input-label">loetud lehekülge kokku<br><small style="opacity:0.6;font-size:0.85rem">raamatu algusest</small></div>
       <button class="btn btn-primary" onclick="saveProgress()">💾 Salvesta!</button>
     </div>
   </div>
 
-  <!-- Progress -->
+  <!-- Progress bar -->
   <div class="card full-width">
     <div class="card-title">📊 Edenemise rada</div>
     <div class="progress-label" id="progressPct">0%</div>
-    <div class="progress-wrap">
-      <div class="progress-fill" id="progressBar" style="width:0%"></div>
-    </div>
+    <div class="progress-wrap"><div class="progress-fill" id="progressBar" style="width:0%"></div></div>
     <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:0.85rem;color:#999;font-weight:600;">
-      <span>0 lk</span>
-      <span id="pagesReadLabel">0 / 323 lk</span>
-      <span>323 lk</span>
+      <span>0 lk</span><span id="pagesReadLabel">0 / 323 lk</span><span>323 lk</span>
     </div>
   </div>
 
-  <!-- Today's target -->
+  <!-- Daily target -->
   <div class="card today-card">
     <div class="card-title">🎯 Täna peab lugema</div>
     <div class="stat-big" id="dailyTarget">—</div>
     <div class="stat-desc">lehekülge päevas</div>
-    <div class="days-left" id="daysLeft" style="margin-top:12px">— päeva jäänud</div>
+    <div class="days-left" id="daysLeft" style="margin-top:12px">—</div>
   </div>
 
-  <!-- Percent done -->
+  <!-- Percent -->
   <div class="card">
     <div class="card-title">✅ Loetud</div>
     <div class="stat-big" style="color:var(--accent)" id="pctDone">0%</div>
     <div class="stat-desc">raamatust läbitud</div>
     <div style="margin-top:12px;font-size:0.9rem;color:#666" id="pagesRemaining">323 lk alles</div>
+    <div style="margin-top:16px">
+      <div class="stat-big" style="color:var(--blue);font-size:2rem" id="avgPages">—</div>
+      <div class="stat-desc">lk päevas (keskmine)</div>
+    </div>
   </div>
 
-  <!-- Streak -->
-  <div class="card streak-card">
-    <div class="card-title">🔥 Streak</div>
-    <div class="stat-big" id="streakCount">0</div>
-    <div class="stat-desc">päeva järjest lugenud</div>
-    <div style="margin-top:12px;font-size:0.9rem;color:#666" id="avgPages">Keskmine: — lk/päev</div>
+  <!-- STREAK CARD -->
+  <div class="card streak-card full-width" id="streakCard">
+    <div class="card-title">🔥 Lugemisstreik</div>
+    <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start;">
+      <div>
+        <div class="streak-number">
+          <span class="flame">🔥</span>
+          <span id="streakNum">0</span>
+        </div>
+        <div class="stat-desc" style="margin-top:8px" id="streakDesc">päeva järjest</div>
+        <div style="margin-top:10px;font-size:0.9rem;font-weight:800" id="streakWarning"></div>
+      </div>
+      <div style="flex:1;min-width:220px;">
+        <div style="font-size:0.8rem;font-weight:800;color:#888;margin-bottom:8px;letter-spacing:0.5px;">VIIMASED 7 PÄEVA</div>
+        <div class="streak-dots" id="streakDots"></div>
+        <div class="milestone-wrap">
+          <div class="milestone-label">
+            <span id="milestoneText">Järgmine auhind</span>
+            <span id="milestoneFrac"></span>
+          </div>
+          <div class="milestone-bar-bg"><div class="milestone-bar-fill" id="milestoneBar" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Badges -->
-  <div class="card">
-    <div class="card-title">🏆 Auhinnad</div>
+  <!-- Streak badges 5/10/15/20/25 -->
+  <div class="card full-width">
+    <div class="card-title">🏅 Streigi auhinnad</div>
     <div class="badges">
-      <div class="badge badge-bronze" id="badge25">🥉 25% loetud</div>
-      <div class="badge badge-silver" id="badge50">🥈 Poolel teel!</div>
-      <div class="badge badge-gold" id="badge75">🥇 75% loetud</div>
-      <div class="badge badge-diamond" id="badge100">💎 Raamat läbi!</div>
-      <div class="badge badge-bronze" id="badge5days">🔥 5-päeva streak</div>
-      <div class="badge badge-silver" id="badge10days">⚡ 10-päeva streak</div>
+      <div class="badge-item" id="sbadge5">
+        <div class="badge-icon">🔥</div>
+        <div class="badge-label">5 päeva</div>
+      </div>
+      <div class="badge-item" id="sbadge10">
+        <div class="badge-icon">⚡</div>
+        <div class="badge-label">10 päeva</div>
+      </div>
+      <div class="badge-item" id="sbadge15">
+        <div class="badge-icon">🌟</div>
+        <div class="badge-label">15 päeva</div>
+      </div>
+      <div class="badge-item" id="sbadge20">
+        <div class="badge-icon">💎</div>
+        <div class="badge-label">20 päeva</div>
+      </div>
+      <div class="badge-item" id="sbadge25">
+        <div class="badge-icon">👑</div>
+        <div class="badge-label">25 päeva</div>
+      </div>
     </div>
   </div>
 
@@ -358,18 +211,15 @@
   <div class="card">
     <div class="card-title">📖 Lugemispäevik <button class="btn btn-small" onclick="clearLog()">Puhasta</button></div>
     <ul class="log-list" id="logList">
-      <li style="color:#ccc;text-align:center;padding:20px;font-size:0.9rem">Veel ei ole kandeid...</li>
+      <li style="color:#ccc;text-align:center;padding:20px;font-size:0.9rem">Laen...</li>
     </ul>
   </div>
 
-  <!-- Motivational message -->
-  <div class="motive-box" id="motiveBox">
-    🚀 Sisesta oma esimene lugemistulemus ja alustame!
-  </div>
+  <!-- Motive -->
+  <div class="motive-box" id="motiveBox">⏳ Laen andmeid...</div>
 
 </div>
 
-<!-- Celebration -->
 <div id="celebrate">
   <div class="celebrate-box">
     <div class="celebrate-emoji" id="celebrateEmoji">🎉</div>
@@ -379,14 +229,32 @@
   </div>
 </div>
 
-<script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDRXWDftQNtAONYJZdD7eWarcfBdkLKRHs",
+    authDomain: "raamat-ime.firebaseapp.com",
+    projectId: "raamat-ime",
+    storageBucket: "raamat-ime.firebasestorage.app",
+    messagingSenderId: "1014735183869",
+    appId: "1:1014735183869:web:5a602057e6a96fad0ac394"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const docRef = doc(db, "raamat", "progress");
+
   const TOTAL = 323;
   const DEADLINE = new Date('2026-04-03');
+  const MILESTONES = [5, 10, 15, 20, 25];
+  const WEEK_DAYS = ['P','E','T','K','N','R','L'];
 
-  const messages = [
+  const MOTIVATIONS = [
     "📚 Iga leht viib sind lähemale lõpule!",
     "⚡ Wow, sa oled nii tubli lugeja!",
-    "🌟 Igas päevas on uus seiklus ukse taga!",
+    "🌟 Igas päevas on uus seiklus ees!",
     "🏃 Jätka nii — sa jõuad kohale!",
     "🎯 Fookus! Lõpumärk on näha!",
     "🦁 Loe nagu lõvi — julgelt ja kiiresti!",
@@ -396,32 +264,48 @@
     "💪 Champion lugejad just niimoodi treenivadki!",
   ];
 
+  function todayStr() { return new Date().toISOString().split('T')[0]; }
+
+  function nDaysAgoStr(n) {
+    const d = new Date();
+    d.setDate(d.getDate() - n);
+    return d.toISOString().split('T')[0];
+  }
+
   function getDaysLeft() {
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    const diff = DEADLINE - today;
-    return Math.max(0, Math.ceil(diff / (1000*60*60*24)));
-  }
-
-  function loadData() {
-    try {
-      return JSON.parse(localStorage.getItem('raamatData') || '{"pages":0,"log":[],"lastDate":"","streak":0}');
-    } catch(e) {
-      return {pages:0,log:[],lastDate:"",streak:0};
-    }
-  }
-
-  function saveData(d) {
-    localStorage.setItem('raamatData', JSON.stringify(d));
-  }
-
-  function todayStr() {
-    return new Date().toISOString().split('T')[0];
+    const t = new Date(); t.setHours(0,0,0,0);
+    return Math.max(0, Math.ceil((DEADLINE - t) / 86400000));
   }
 
   function formatDate(str) {
-    const d = new Date(str);
-    return d.toLocaleDateString('et-EE', {day:'numeric',month:'short'});
+    return new Date(str).toLocaleDateString('et-EE', {day:'numeric', month:'short'});
+  }
+
+  // Duolingo streak: count consecutive days backwards from today.
+  // If today not yet logged, streak is still "alive" if yesterday was logged.
+  // If yesterday not logged (and today not logged), streak = 0.
+  function calcStreak(log) {
+    if (!log || log.length === 0) return 0;
+    const dates = new Set(log.map(e => e.date));
+    const today = todayStr();
+    const yesterday = nDaysAgoStr(1);
+
+    // Start counting from today if logged, else from yesterday
+    let start = dates.has(today) ? today : (dates.has(yesterday) ? yesterday : null);
+    if (!start) return 0;
+
+    let streak = 0;
+    let cursor = new Date(start);
+    while (true) {
+      const ds = cursor.toISOString().split('T')[0];
+      if (dates.has(ds)) {
+        streak++;
+        cursor.setDate(cursor.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+    return streak;
   }
 
   function render(data) {
@@ -429,157 +313,185 @@
     const pct = Math.round((pages / TOTAL) * 100);
     const remaining = TOTAL - pages;
     const daysLeft = getDaysLeft();
-    const dailyTarget = daysLeft > 0 ? Math.ceil(remaining / daysLeft) : remaining;
+    const log = data.log || [];
+    const streak = calcStreak(log);
+    const todayLogged = log.some(e => e.date === todayStr());
 
+    // Progress
     document.getElementById('progressBar').style.width = pct + '%';
     document.getElementById('progressPct').textContent = pct + '%';
     document.getElementById('pagesReadLabel').textContent = pages + ' / ' + TOTAL + ' lk';
     document.getElementById('pctDone').textContent = pct + '%';
     document.getElementById('pagesRemaining').textContent = remaining > 0 ? remaining + ' lk alles' : '🎉 Raamat loetud!';
     document.getElementById('daysLeft').textContent = daysLeft + ' päeva jäänud';
-    document.getElementById('dailyTarget').textContent = remaining > 0 ? (daysLeft > 0 ? dailyTarget : '😬 Tähtaeg möödas!') : '🎉 Valmis!';
+    document.getElementById('dailyTarget').textContent = remaining > 0
+      ? (daysLeft > 0 ? Math.ceil(remaining / daysLeft) : '😬')
+      : '🎉';
 
-    // Streak
-    document.getElementById('streakCount').textContent = data.streak || 0;
+    // Streak number + state
+    document.getElementById('streakNum').textContent = streak;
+    const card = document.getElementById('streakCard');
+    if (streak === 0) {
+      card.classList.add('streak-dead');
+      document.getElementById('streakDesc').textContent = 'Alusta täna uuesti!';
+      document.getElementById('streakWarning').textContent = '';
+    } else {
+      card.classList.remove('streak-dead');
+      document.getElementById('streakDesc').textContent = streak === 1 ? 'päev järjest 🔥' : 'päeva järjest 🔥';
+      if (!todayLogged) {
+        document.getElementById('streakWarning').innerHTML = '⚠️ Loe täna, muidu streak kaob!';
+        document.getElementById('streakWarning').style.color = '#FF3B30';
+      } else {
+        document.getElementById('streakWarning').innerHTML = '✅ Tänane lugemine kirjas!';
+        document.getElementById('streakWarning').style.color = '#06D6A0';
+      }
+    }
 
-    // Avg
-    const log = data.log || [];
-    if (log.length > 1) {
-      const sorted = [...log].sort((a,b) => a.date.localeCompare(b.date));
-      const totalPages = pages;
-      const days = log.length;
-      const avg = Math.round(totalPages / days);
-      document.getElementById('avgPages').textContent = 'Keskmine: ' + avg + ' lk/päev';
+    // 7-day dots
+    const dotsEl = document.getElementById('streakDots');
+    dotsEl.innerHTML = '';
+    for (let i = 6; i >= 0; i--) {
+      const ds = nDaysAgoStr(i);
+      const d = new Date(ds);
+      const logged = log.some(e => e.date === ds);
+      const isToday = i === 0;
+      const dot = document.createElement('div');
+      if (logged) dot.className = 'streak-dot done';
+      else if (isToday) dot.className = 'streak-dot today-pending';
+      else dot.className = 'streak-dot missed';
+      dot.innerHTML = `<span>${logged ? '✓' : isToday ? '?' : '✗'}</span><span class="dot-day">${WEEK_DAYS[d.getDay()]}</span>`;
+      dotsEl.appendChild(dot);
+    }
+
+    // Milestone progress bar
+    const next = MILESTONES.find(m => m > streak);
+    if (next) {
+      const prev = MILESTONES.filter(m => m <= streak).pop() || 0;
+      const fill = Math.round(((streak - prev) / (next - prev)) * 100);
+      document.getElementById('milestoneText').textContent = `🏅 ${next} päeva auhinnani`;
+      document.getElementById('milestoneFrac').textContent = streak + ' / ' + next;
+      document.getElementById('milestoneBar').style.width = fill + '%';
+    } else {
+      document.getElementById('milestoneText').textContent = '👑 Kõik auhinnad kogutud!';
+      document.getElementById('milestoneFrac').textContent = '';
+      document.getElementById('milestoneBar').style.width = '100%';
     }
 
     // Badges
-    setBadge('badge25', pct >= 25);
-    setBadge('badge50', pct >= 50);
-    setBadge('badge75', pct >= 75);
-    setBadge('badge100', pct >= 100);
-    setBadge('badge5days', (data.streak||0) >= 5);
-    setBadge('badge10days', (data.streak||0) >= 10);
+    MILESTONES.forEach(m => {
+      document.getElementById('sbadge' + m).classList.toggle('earned', streak >= m);
+    });
 
     // Log
-    renderLog(log);
+    const el = document.getElementById('logList');
+    if (!log.length) {
+      el.innerHTML = '<li style="color:#ccc;text-align:center;padding:20px;font-size:0.9rem">Veel ei ole kandeid...</li>';
+    } else {
+      const sorted = [...log].sort((a,b) => b.date.localeCompare(a.date));
+      el.innerHTML = sorted.slice(0,20).map(e =>
+        `<li class="log-item">
+          <span class="log-date">${formatDate(e.date)}</span>
+          <span>${e.pages} lk kokku</span>
+          <span class="log-pages">+${e.added > 0 ? e.added : 0} lk</span>
+        </li>`
+      ).join('');
+    }
 
-    // Motivational message
-    const idx = Math.floor(Math.random() * messages.length);
-    const msg = pct >= 100
-      ? '🎊 RAAMAT ON LOETUD! Sa oled suurepärane!'
-      : pct >= 75
-      ? '🏁 Ainult ' + remaining + ' lehte veel! Finišijoon on lähedal!'
-      : pct >= 50
-      ? '🌟 Rohkem kui pool tehtud! Sa oled absoluutne täht!'
-      : pages > 0
-      ? messages[idx]
+    // Avg
+    if (log.length > 0) {
+      const byDay = {};
+      log.forEach(e => { if (e.added > 0) byDay[e.date] = (byDay[e.date]||0) + e.added; });
+      const vals = Object.values(byDay);
+      if (vals.length) {
+        document.getElementById('avgPages').textContent = Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+      }
+    }
+
+    // Motivation
+    const msg = pct >= 100 ? '🎊 RAAMAT ON LOETUD! Sa oled suurepärane!'
+      : pct >= 75 ? '🏁 Ainult ' + remaining + ' lehte veel — finišijoon on näha!'
+      : pct >= 50 ? '🌟 Üle poole tehtud! Sa oled absoluutne täht!'
+      : streak >= 15 ? '🔥 ' + streak + '-päeva streak! Sa oled lugemislegend!'
+      : streak >= 10 ? '⚡ 10+ päeva streak — Duolingo oleks kadedust suremas!'
+      : streak >= 5 ? '🔥 Viis päeva streak! Jätka samas tempos!'
+      : pages > 0 ? MOTIVATIONS[Math.floor(Math.random() * MOTIVATIONS.length)]
       : '🚀 Sisesta oma esimene lugemistulemus ja alustame!';
     document.getElementById('motiveBox').textContent = msg;
+
+    if (pages > 0) document.getElementById('pageInput').placeholder = pages;
   }
 
-  function setBadge(id, earned) {
-    const el = document.getElementById(id);
-    if (earned) el.classList.add('earned');
-    else el.classList.remove('earned');
-  }
+  let currentData = null;
 
-  function renderLog(log) {
-    const el = document.getElementById('logList');
-    if (!log || log.length === 0) {
-      el.innerHTML = '<li style="color:#ccc;text-align:center;padding:20px;font-size:0.9rem">Veel ei ole kandeid...</li>';
-      return;
-    }
-    const sorted = [...log].sort((a,b) => b.date.localeCompare(a.date));
-    el.innerHTML = sorted.slice(0,20).map(entry =>
-      `<li class="log-item">
-        <span class="log-date">${formatDate(entry.date)}</span>
-        <span>${entry.pages} lk kokku</span>
-        <span class="log-pages">+${entry.added} lk</span>
-      </li>`
-    ).join('');
-  }
+  onSnapshot(docRef, snap => {
+    currentData = snap.exists() ? snap.data() : {pages:0,log:[]};
+    render(currentData);
+    const s = document.getElementById('syncStatus');
+    s.textContent = '✅ Sünkroniseeritud'; s.className = 'sync-status sync-ok';
+  }, () => {
+    document.getElementById('syncStatus').textContent = '❌ Ühendus ebaõnnestus';
+    document.getElementById('syncStatus').className = 'sync-status sync-err';
+  });
 
-  function saveProgress() {
+  window.saveProgress = async function() {
     const input = document.getElementById('pageInput');
     const val = parseInt(input.value);
     if (isNaN(val) || val < 0) { alert('Sisesta lehekülgede arv!'); return; }
     if (val > TOTAL) { alert('Raamatus on ainult ' + TOTAL + ' lehekülge! 😄'); return; }
 
-    const data = loadData();
+    const data = currentData ? JSON.parse(JSON.stringify(currentData)) : {pages:0,log:[]};
     const prevPages = data.pages || 0;
     const added = val - prevPages;
+    if (added < 0 && !confirm('Sisestad väiksema arvu kui enne (' + prevPages + ' lk). Kas oled kindel?')) return;
 
-    if (added < 0) {
-      if (!confirm('Sisestad väiksema arvu kui enne (' + prevPages + ' lk). Kas oled kindel?')) return;
-    }
-
-    // Streak
     const today = todayStr();
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toISOString().split('T')[0];
-
-    if (data.lastDate === today) {
-      // update today
-    } else if (data.lastDate === yesterdayStr) {
-      data.streak = (data.streak || 0) + 1;
-    } else if (!data.lastDate) {
-      data.streak = 1;
+    const log = data.log || [];
+    const idx = log.findIndex(e => e.date === today);
+    if (idx >= 0) {
+      const delta = val - prevPages;
+      log[idx].pages = val;
+      log[idx].added = Math.max(0, log[idx].added + delta);
     } else {
-      data.streak = 1; // reset
+      log.push({date: today, pages: val, added: Math.max(0, added)});
     }
-    data.lastDate = today;
-
-    // Log
-    const existingIdx = (data.log||[]).findIndex(e => e.date === today);
-    if (existingIdx >= 0) {
-      data.log[existingIdx] = {date: today, pages: val, added: (data.log[existingIdx].added + (val - prevPages))};
-    } else {
-      data.log = data.log || [];
-      data.log.push({date: today, pages: val, added: added > 0 ? added : 0});
-    }
-
+    data.log = log;
     data.pages = val;
-    saveData(data);
-    render(data);
+
+    const prevStreak = calcStreak(data.log.filter(e => e.date !== today));
+    const newStreak = calcStreak(log);
+
+    document.getElementById('syncStatus').textContent = '⏳ Salvestab...';
+    await setDoc(docRef, data);
     input.value = '';
 
-    // Celebrate milestones
-    const pct = Math.round((val / TOTAL) * 100);
-    const prevPct = Math.round((prevPages / TOTAL) * 100);
-    if (val >= TOTAL && prevPages < TOTAL) {
-      showCelebrate('🎊', 'RAAMAT LOETUD!', 'Sa oled ülimalt tubli! Suurepärane töö! 🌟');
-    } else if (pct >= 75 && prevPct < 75) {
-      showCelebrate('🥇', '75% loetud!', 'Ainult veerand on alles — sa jõuad kohale!');
-    } else if (pct >= 50 && prevPct < 50) {
-      showCelebrate('🥈', 'Pool raamatut loetud!', 'Suurepärane! Jätka samas tempos!');
-    } else if (pct >= 25 && prevPct < 25) {
-      showCelebrate('🥉', 'Esimene veerand läbitud!', 'Vahva! Sa oled tõeline raamatusõber!');
-    }
-  }
+    // Celebrations
+    const pct = Math.round((val/TOTAL)*100);
+    const prevPct = Math.round((prevPages/TOTAL)*100);
+    if (val >= TOTAL && prevPages < TOTAL) showCelebrate('🎊','RAAMAT LOETUD!','Sa oled ülimalt tubli! 🌟');
+    else if (newStreak === 25 && prevStreak < 25) showCelebrate('👑','25 PÄEVA STREAK!','Sa oled lugemislegend! Absoluutselt uskumatu!');
+    else if (newStreak === 20 && prevStreak < 20) showCelebrate('💎','20 PÄEVA STREAK!','Kakskümmend päeva järjest — WOW!');
+    else if (newStreak === 15 && prevStreak < 15) showCelebrate('🌟','15 PÄEVA STREAK!','Viisteist päeva — sa oled superhős!');
+    else if (newStreak === 10 && prevStreak < 10) showCelebrate('⚡','10 PÄEVA STREAK!','Kümme päeva järjest! Duolingo oleks uhke!');
+    else if (newStreak === 5 && prevStreak < 5) showCelebrate('🔥','5 PÄEVA STREAK!','Viis päeva järjest — tubli lugeja! 🦉');
+    else if (pct >= 75 && prevPct < 75) showCelebrate('🥇','75% loetud!','Ainult veerand on alles — jõuad kohale!');
+    else if (pct >= 50 && prevPct < 50) showCelebrate('🥈','Pool raamatut loetud!','Suurepärane! Jätka samas tempos!');
+    else if (pct >= 25 && prevPct < 25) showCelebrate('🥉','Esimene veerand läbitud!','Vahva lugeja!');
+  };
 
-  function showCelebrate(emoji, title, sub) {
+  window.clearLog = async function() {
+    if (!confirm('Kustutad kogu ajaloo? Seda ei saa tagasi võtta.')) return;
+    await setDoc(docRef, {pages:0,log:[]});
+  };
+
+  window.showCelebrate = function(emoji, title, sub) {
     document.getElementById('celebrateEmoji').textContent = emoji;
     document.getElementById('celebrateTitle').textContent = title;
     document.getElementById('celebrateSub').textContent = sub;
     document.getElementById('celebrate').classList.add('show');
-  }
-
-  function closeCelebrate() {
+  };
+  window.closeCelebrate = function() {
     document.getElementById('celebrate').classList.remove('show');
-  }
-
-  function clearLog() {
-    if (!confirm('Kustutad kogu ajaloo? Seda ei saa tagasi võtta.')) return;
-    saveData({pages:0,log:[],lastDate:"",streak:0});
-    document.getElementById('pageInput').value = '';
-    render(loadData());
-  }
-
-  // Init
-  const data = loadData();
-  if (data.pages) document.getElementById('pageInput').placeholder = data.pages;
-  render(data);
+  };
 </script>
 </body>
 </html>
