@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧖 Sauna Log</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0c0a;
+  --surface: #1a1510;
+  --surface2: #231e18;
+  --border: #2e2820;
+  --ember: #E8540A;
+  --ember2: #F5820A;
+  --gold: #C9973A;
+  --steam: #8FA3A8;
+  --text: #F0E8DC;
+  --muted: #7A6E64;
+  --away: #4A90D9;
+  --away2: #6BAEE8;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 0 0 60px;
+}
+
+/* Background texture */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(232,84,10,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, rgba(74,144,217,0.06) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wrap { max-width: 860px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 1; }
+
+/* Header */
+header {
+  padding: 48px 20px 32px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+.header-emoji { font-size: 3.5rem; display: block; margin-bottom: 12px; filter: drop-shadow(0 0 20px rgba(232,84,10,0.6)); }
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-weight: 900;
+  background: linear-gradient(135deg, #F5820A, #C9973A);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+  letter-spacing: -1px;
+}
+.sync-bar {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 8px;
+  min-height: 16px;
+}
+.sync-ok { color: #4CAF50; }
+.sync-err { color: var(--ember); }
+
+/* Score hero */
+.score-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 0 auto 28px;
+  max-width: 860px;
+  padding: 0 20px;
+}
+.score-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.score-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.score-card.this-year::before { background: linear-gradient(90deg, var(--ember), var(--ember2)); }
+.score-card.last-year::before { background: linear-gradient(90deg, var(--away), var(--away2)); }
+
+.score-year { font-size: 0.78rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.score-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 4.5rem;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.this-year .score-num { color: var(--ember2); }
+.last-year .score-num { color: var(--away2); }
+.score-sub { font-size: 0.85rem; color: var(--muted); }
+
+/* Pace comparison */
+.pace-card {
+  max-width: 860px;
+  margin: 0 auto 28px;
+  padding: 0 20px;
+}
+.pace-inner {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 22px 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.pace-label { font-size: 0.78rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.pace-nums { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.pace-this { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--ember2); }
+.pace-last { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: var(--away2); opacity: 0.8; }
+.pace-arrow { font-size: 1.2rem; color: var(--muted); }
+.pace-diff { font-size: 0.9rem; font-weight: 600; padding: 4px 12px; border-radius: 50px; }
+.pace-diff.ahead { background: rgba(76,175,80,0.15); color: #4CAF50; }
+.pace-diff.behind { background: rgba(232,84,10,0.15); color: var(--ember); }
+.pace-diff.equal { background: rgba(201,151,58,0.15); color: var(--gold); }
+
+/* Grid layout */
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; max-width: 860px; margin: 0 auto 28px; padding: 0 20px; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 22px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.card:hover { border-color: #3e3530; transform: translateY(-2px); }
+
+.card-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+.stat-big {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ember2);
+  margin-bottom: 4px;
+}
+.stat-sub { font-size: 0.85rem; color: var(--muted); }
+
+/* Home vs Away bars */
+.split-bar { margin-top: 14px; }
+.split-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.85rem; }
+.split-label { width: 70px; color: var(--muted); font-size: 0.8rem; }
+.split-track { flex: 1; height: 8px; background: var(--border); border-radius: 50px; overflow: hidden; }
+.split-fill { height: 100%; border-radius: 50px; transition: width 0.8s cubic-bezier(.34,1.2,.64,1); }
+.fill-home { background: linear-gradient(90deg, var(--ember), var(--ember2)); }
+.fill-away { background: linear-gradient(90deg, var(--away), var(--away2)); }
+.split-count { width: 24px; text-align: right; font-weight: 600; font-size: 0.85rem; }
+
+/* TOP list */
+.top-list { list-style: none; margin-top: 4px; }
+.top-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+.top-item:last-child { border-bottom: none; }
+.top-rank { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--gold); width: 24px; }
+.top-name { flex: 1; color: var(--text); }
+.top-count { font-weight: 600; color: var(--away2); }
+
+/* Month chart */
+.month-chart { margin-top: 8px; }
+.month-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 0.8rem; }
+.month-name { width: 32px; color: var(--muted); font-size: 0.75rem; }
+.month-bars { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.month-bar-wrap { display: flex; align-items: center; gap: 6px; }
+.month-track { flex: 1; height: 7px; background: var(--border); border-radius: 50px; overflow: hidden; }
+.month-fill-this { background: linear-gradient(90deg, var(--ember), var(--ember2)); border-radius: 50px; height: 100%; transition: width 0.8s; }
+.month-fill-last { background: linear-gradient(90deg, var(--away), var(--away2)); opacity: 0.5; border-radius: 50px; height: 100%; transition: width 0.8s; }
+.month-val { width: 18px; font-size: 0.72rem; text-align: right; }
+.month-val.this { color: var(--ember2); }
+.month-val.last { color: var(--away2); opacity: 0.7; }
+
+/* Beer stats */
+.beer-row { display: flex; align-items: baseline; gap: 8px; margin-top: 10px; }
+.beer-big { font-family: 'Playfair Display', serif; font-size: 2.4rem; color: var(--gold); }
+.beer-label { font-size: 0.85rem; color: var(--muted); }
+
+/* Log section */
+.log-section { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  color: var(--text);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.year-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+.tab {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: 50px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tab.active { background: var(--ember); border-color: var(--ember); color: white; }
+.log-table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+th { text-align: left; padding: 10px 14px; font-size: 0.72rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); font-weight: 600; }
+td { padding: 11px 14px; border-bottom: 1px solid var(--border); }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--surface2); }
+.badge-home { background: rgba(232,84,10,0.15); color: var(--ember2); padding: 3px 10px; border-radius: 50px; font-size: 0.78rem; font-weight: 600; }
+.badge-away { background: rgba(74,144,217,0.15); color: var(--away2); padding: 3px 10px; border-radius: 50px; font-size: 0.78rem; font-weight: 600; }
+.beer-dots { color: var(--gold); letter-spacing: 2px; }
+
+/* Add form */
+.add-section { max-width: 860px; margin: 0 auto 28px; padding: 0 20px; }
+.add-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+}
+.add-title { font-size: 0.75rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+.form-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 0.75rem; color: var(--muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+.form-input {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  min-width: 130px;
+}
+.form-input:focus { border-color: var(--ember); }
+.form-select { min-width: 110px; }
+.btn-add {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 11px 28px;
+  background: linear-gradient(135deg, var(--ember), var(--ember2));
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.btn-add:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(232,84,10,0.4); }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .score-hero { grid-template-columns: 1fr 1fr; }
+  .score-num { font-size: 3rem; }
+  .form-row { flex-direction: column; }
+  .form-input, .form-select { min-width: unset; width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="header-emoji">🧖</span>
+  <h1>Sauna Log</h1>
+  <div class="sync-bar" id="syncBar">⏳ Ühendun...</div>
+</header>
+
+<!-- Score hero -->
+<div class="score-hero">
+  <div class="score-card this-year">
+    <div class="score-year">2026</div>
+    <div class="score-num" id="score2026">—</div>
+    <div class="score-sub">sauna kokku</div>
+  </div>
+  <div class="score-card last-year">
+    <div class="score-year">2025</div>
+    <div class="score-num">110</div>
+    <div class="score-sub">sauna kokku</div>
+  </div>
+</div>
+
+<!-- Pace comparison -->
+<div class="pace-card">
+  <div class="pace-inner">
+    <div style="flex:1">
+      <div class="pace-label">Sama periood — tempo võrdlus</div>
+      <div class="pace-nums">
+        <span class="pace-this" id="pace2026">—</span>
+        <span class="pace-arrow">↔</span>
+        <span class="pace-last" id="pace2025">—</span>
+        <span class="pace-diff" id="paceDiff">—</span>
+      </div>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:6px" id="paceDesc">2026 vs 2025 tänase kuupäevani</div>
+    </div>
+    <div style="text-align:center;font-size:2.5rem">🔥</div>
+  </div>
+</div>
+
+<!-- Stats grid -->
+<div class="grid">
+  <!-- Home vs Away -->
+  <div class="card">
+    <div class="card-title">🏠 Kodus vs Võõrsil</div>
+    <div class="split-bar">
+      <div class="split-row">
+        <div class="split-label">Kodus</div>
+        <div class="split-track"><div class="split-fill fill-home" id="barHome" style="width:0%"></div></div>
+        <div class="split-count" id="cntHome">0</div>
+      </div>
+      <div class="split-row">
+        <div class="split-label">Võõrsil</div>
+        <div class="split-track"><div class="split-fill fill-away" id="barAway" style="width:0%"></div></div>
+        <div class="split-count" id="cntAway">0</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;font-size:0.82rem;color:var(--muted)" id="splitPct">—</div>
+  </div>
+
+  <!-- Beer -->
+  <div class="card">
+    <div class="card-title">🍺 Õlled saunas (2026)</div>
+    <div class="beer-row">
+      <div class="beer-big" id="beerTotal">0</div>
+      <div class="beer-label">õlut kokku</div>
+    </div>
+    <div style="margin-top:10px;font-size:0.85rem;color:var(--muted)">
+      Keskmine sauna kohta: <span id="beerAvg" style="color:var(--gold);font-weight:600">0</span>
+    </div>
+    <div style="margin-top:6px;font-size:0.85rem;color:var(--muted)">
+      Rekord ühes saunas: <span id="beerMax" style="color:var(--gold);font-weight:600">0 ★</span>
+    </div>
+  </div>
+
+  <!-- Away TOP -->
+  <div class="card">
+    <div class="card-title">📍 Võõrsil TOP (2026)</div>
+    <ul class="top-list" id="awayTop">
+      <li class="top-item" style="color:var(--muted);font-size:0.85rem">Andmed laadivad...</li>
+    </ul>
+  </div>
+
+  <!-- Per week -->
+  <div class="card">
+    <div class="card-title">📅 Tempo</div>
+    <div class="stat-big" id="perWeek">—</div>
+    <div class="stat-sub">sauna nädalas (2026 keskmine)</div>
+    <div style="margin-top:16px">
+      <div class="stat-big" style="font-size:2rem;color:var(--gold)" id="longestStreak">—</div>
+      <div class="stat-sub">päeva pikim vahe saunade vahel</div>
+    </div>
+  </div>
+</div>
+
+<!-- Monthly comparison -->
+<div style="max-width:860px;margin:0 auto 28px;padding:0 20px;">
+  <div class="card">
+    <div class="card-title">📊 Kuude võrdlus
+      <span style="margin-left:8px;font-size:0.72rem">
+        <span style="color:var(--ember2)">■</span> 2026 &nbsp;
+        <span style="color:var(--away2);opacity:0.7">■</span> 2025
+      </span>
+    </div>
+    <div class="month-chart" id="monthChart">Laen...</div>
+  </div>
+</div>
+
+<!-- Add new sauna -->
+<div class="add-section">
+  <div class="add-card">
+    <div class="add-title">➕ Lisa uus saun</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Kuupäev</label>
+        <input type="date" class="form-input" id="newDate">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tüüp</label>
+        <select class="form-input form-select" id="newType">
+          <option value="home">Kodus</option>
+          <option value="away">Võõrsil</option>
+        </select>
+      </div>
+      <div class="form-group" id="locationGroup">
+        <label class="form-label">Koht</label>
+        <input type="text" class="form-input" id="newLocation" placeholder="nt Viimsi spa">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Õlled 🍺</label>
+        <select class="form-input form-select" id="newBeers">
+          <option value="0">—</option>
+          <option value="1">★ (1)</option>
+          <option value="2">★★ (2)</option>
+          <option value="3">★★★ (3)</option>
+          <option value="4">★★★★ (4)</option>
+        </select>
+      </div>
+      <button class="btn-add" onclick="addSauna()">Lisa saun 🧖</button>
+    </div>
+  </div>
+</div>
+
+<!-- Log table -->
+<div class="log-section">
+  <div class="section-title">📋 Saunapäevik</div>
+  <div class="year-tabs">
+    <button class="tab active" onclick="showYear(2026, this)">2026</button>
+    <button class="tab" onclick="showYear(2025, this)">2025</button>
+  </div>
+  <div class="log-table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Kuupäev</th>
+          <th>Tüüp</th>
+          <th>Koht</th>
+          <th>Õlled</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="logBody">
+        <tr><td colspan="6" style="color:var(--muted);text-align:center;padding:24px">Laen...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDRXWDftQNtAONYJZdD7eWarcfBdkLKRHs",
+  authDomain: "raamat-ime.firebaseapp.com",
+  projectId: "raamat-ime",
+  storageBucket: "raamat-ime.firebasestorage.app",
+  messagingSenderId: "1014735183869",
+  appId: "1:1014735183869:web:5a602057e6a96fad0ac394"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const saunaRef = doc(db, "sauna", "log");
+
+// ── 2025 HISTORICAL DATA ──
+const DATA_2025 = [
+  // KODUS
+  {date:"2025-01-19",type:"home",location:"",beers:0},
+  {date:"2025-01-23",type:"home",location:"",beers:0},
+  {date:"2025-01-26",type:"home",location:"",beers:0},
+  {date:"2025-01-31",type:"home",location:"",beers:0},
+  {date:"2025-02-02",type:"home",location:"",beers:0},
+  {date:"2025-02-09",type:"home",location:"",beers:0},
+  {date:"2025-02-12",type:"home",location:"",beers:0},
+  {date:"2025-02-21",type:"home",location:"",beers:0},
+  {date:"2025-03-06",type:"home",location:"",beers:0},
+  {date:"2025-03-13",type:"home",location:"",beers:0},
+  {date:"2025-03-09",type:"home",location:"",beers:0},
+  {date:"2025-03-16",type:"home",location:"",beers:0},
+  {date:"2025-03-17",type:"home",location:"",beers:0},
+  {date:"2025-03-23",type:"home",location:"",beers:0},
+  {date:"2025-03-30",type:"home",location:"",beers:0},
+  {date:"2025-04-01",type:"home",location:"",beers:0},
+  {date:"2025-04-04",type:"home",location:"",beers:0},
+  {date:"2025-04-07",type:"home",location:"",beers:0},
+  {date:"2025-04-10",type:"home",location:"",beers:0},
+  {date:"2025-04-13",type:"home",location:"",beers:0},
+  {date:"2025-04-16",type:"home",location:"",beers:0},
+  {date:"2025-04-20",type:"home",location:"",beers:0},
+  {date:"2025-04-24",type:"home",location:"",beers:0},
+  {date:"2025-05-04",type:"home",location:"",beers:0},
+  {date:"2025-05-12",type:"home",location:"",beers:0},
+  {date:"2025-05-15",type:"home",location:"",beers:0},
+  {date:"2025-05-18",type:"home",location:"",beers:0},
+  {date:"2025-05-29",type:"home",location:"",beers:0},
+  {date:"2025-06-01",type:"home",location:"",beers:0},
+  {date:"2025-06-05",type:"home",location:"",beers:0},
+  {date:"2025-07-17",type:"home",location:"",beers:0},
+  {date:"2025-06-13",type:"home",location:"",beers:0},
+  {date:"2025-07-05",type:"home",location:"",beers:0},
+  {date:"2025-07-13",type:"home",location:"",beers:0},
+  {date:"2025-07-22",type:"home",location:"",beers:0},
+  {date:"2025-07-27",type:"home",location:"",beers:0},
+  {date:"2025-08-04",type:"home",location:"",beers:0},
+  {date:"2025-08-10",type:"home",location:"",beers:0},
+  {date:"2025-08-15",type:"home",location:"",beers:0},
+  {date:"2025-08-25",type:"home",location:"",beers:0},
+  {date:"2025-08-31",type:"home",location:"",beers:0},
+  {date:"2025-09-07",type:"home",location:"",beers:0},
+  {date:"2025-09-11",type:"home",location:"",beers:0},
+  {date:"2025-09-13",type:"home",location:"",beers:0},
+  {date:"2025-09-18",type:"home",location:"",beers:0},
+  {date:"2025-09-21",type:"home",location:"",beers:0},
+  {date:"2025-09-25",type:"home",location:"",beers:0},
+  {date:"2025-09-28",type:"home",location:"",beers:0},
+  {date:"2025-10-05",type:"home",location:"",beers:0},
+  {date:"2025-10-12",type:"home",location:"",beers:0},
+  {date:"2025-10-15",type:"home",location:"",beers:0},
+  {date:"2025-10-24",type:"home",location:"",beers:0},
+  {date:"2025-10-26",type:"home",location:"",beers:0},
+  {date:"2025-11-02",type:"home",location:"",beers:0},
+  {date:"2025-11-07",type:"home",location:"",beers:0},
+  {date:"2025-11-09",type:"home",location:"",beers:0},
+  {date:"2025-11-11",type:"home",location:"",beers:0},
+  {date:"2025-11-16",type:"home",location:"",beers:0},
+  {date:"2025-11-23",type:"home",location:"",beers:0},
+  {date:"2025-11-30",type:"home",location:"",beers:0},
+  {date:"2025-12-03",type:"home",location:"",beers:0},
+  {date:"2025-12-05",type:"home",location:"",beers:0},
+  {date:"2025-12-14",type:"home",location:"",beers:0},
+  {date:"2025-12-20",type:"home",location:"",beers:0},
+  {date:"2025-12-28",type:"home",location:"",beers:0},
+  {date:"2025-12-30",type:"home",location:"",beers:0},
+  // VÕÕRSIL
+  {date:"2025-02-06",type:"away",location:"Vend",beers:0},
+  {date:"2025-02-08",type:"away",location:"Juhan",beers:0},
+  {date:"2025-02-16",type:"away",location:"Ott",beers:0},
+  {date:"2025-03-19",type:"away",location:"Ott",beers:0},
+  {date:"2025-03-26",type:"away",location:"Viimsi spa",beers:0},
+  {date:"2025-03-29",type:"away",location:"Raua saun",beers:0},
+  {date:"2025-04-12",type:"away",location:"Madis",beers:0},
+  {date:"2025-04-19",type:"away",location:"Vääna",beers:0},
+  {date:"2025-04-26",type:"away",location:"Vääna",beers:0},
+  {date:"2025-04-30",type:"away",location:"Ott",beers:0},
+  {date:"2025-05-01",type:"away",location:"Haapsalu spa",beers:0},
+  {date:"2025-05-02",type:"away",location:"Haapsalu spa",beers:0},
+  {date:"2025-05-03",type:"away",location:"Haapsalu spa",beers:0},
+  {date:"2025-05-23",type:"away",location:"Ott",beers:0},
+  {date:"2025-05-26",type:"away",location:"Viimsi spa",beers:0},
+  {date:"2025-05-30",type:"away",location:"Vääna",beers:0},
+  {date:"2025-06-08",type:"away",location:"Viimsi spa",beers:0},
+  {date:"2025-06-12",type:"away",location:"Madis",beers:0},
+  {date:"2025-06-19",type:"away",location:"Ott",beers:0},
+  {date:"2025-06-21",type:"away",location:"Vääna",beers:0},
+  {date:"2025-07-02",type:"away",location:"Vääna",beers:0},
+  {date:"2025-07-06",type:"away",location:"Viimsi spa",beers:0},
+  {date:"2025-07-11",type:"away",location:"Viimsi spa",beers:0},
+  {date:"2025-07-19",type:"away",location:"Vääna",beers:0},
+  {date:"2025-08-01",type:"away",location:"Kalana",beers:0},
+  {date:"2025-08-06",type:"away",location:"Vääna",beers:0},
+  {date:"2025-08-19",type:"away",location:"Vend",beers:0},
+  {date:"2025-08-22",type:"away",location:"Aivo",beers:0},
+  {date:"2025-08-24",type:"away",location:"Viimsi spa",beers:0},
+  {date:"2025-09-27",type:"away",location:"Viimsi spa",beers:0},
+  {date:"2025-10-16",type:"away",location:"Viimsi 18+",beers:0},
+  {date:"2025-10-19",type:"away",location:"Ott",beers:0},
+  {date:"2025-10-20",type:"away",location:"Ring spa",beers:0},
+  {date:"2025-10-24",type:"away",location:"Viimsi spa",beers:0},
+  {date:"2025-10-29",type:"away",location:"Madis",beers:0},
+  {date:"2025-10-31",type:"away",location:"Vend",beers:0},
+  {date:"2025-11-29",type:"away",location:"Viimsi spa",beers:0},
+  {date:"2025-12-06",type:"away",location:"Ott",beers:0},
+  {date:"2025-12-11",type:"away",location:"Madis",beers:0},
+  {date:"2025-12-21",type:"away",location:"Viimsi spa",beers:0},
+  {date:"2025-12-25",type:"away",location:"Hilton",beers:0},
+  // Ott in jan
+  {date:"2025-01-01",type:"away",location:"Ott",beers:0},
+];
+
+// ── 2026 INITIAL DATA (from your notes) ──
+const INITIAL_2026 = [
+  {date:"2026-01-01",type:"home",location:"",beers:4},
+  {date:"2026-01-03",type:"home",location:"",beers:4},
+  {date:"2026-01-09",type:"home",location:"",beers:3},
+  {date:"2026-01-11",type:"home",location:"",beers:2},
+  {date:"2026-01-15",type:"home",location:"",beers:3},
+  {date:"2026-01-26",type:"home",location:"",beers:0},
+  {date:"2026-02-06",type:"home",location:"",beers:3},
+  {date:"2026-02-09",type:"home",location:"",beers:4},
+  {date:"2026-02-14",type:"home",location:"",beers:3},
+  {date:"2026-02-21",type:"home",location:"",beers:3},
+  {date:"2026-02-26",type:"home",location:"",beers:3},
+  {date:"2026-03-06",type:"home",location:"",beers:3},
+  {date:"2026-03-08",type:"home",location:"",beers:2},
+  {date:"2026-01-20",type:"away",location:"Madeira",beers:1},
+  {date:"2026-01-31",type:"away",location:"Viimsi spa",beers:0},
+  {date:"2026-02-12",type:"away",location:"Ott",beers:3},
+  {date:"2026-02-22",type:"away",location:"Viimsi spa",beers:2},
+  {date:"2026-02-24",type:"away",location:"Madis",beers:1},
+  {date:"2026-02-28",type:"away",location:"Vend",beers:3},
+];
+
+const MONTHS_ET = ['Jaan','Veebr','Märts','Apr','Mai','Juuni','Juuli','Aug','Sept','Okt','Nov','Dets'];
+
+let currentData = null;
+let viewYear = 2026;
+
+// Live sync
+onSnapshot(saunaRef, snap => {
+  if (snap.exists()) {
+    currentData = snap.data();
+  } else {
+    // First time — seed with initial 2026 data
+    currentData = { saunas2026: INITIAL_2026 };
+    setDoc(saunaRef, currentData);
+  }
+  render();
+  const sb = document.getElementById('syncBar');
+  sb.textContent = '✅ Sünkroniseeritud'; sb.className = 'sync-bar sync-ok';
+}, () => {
+  document.getElementById('syncBar').textContent = '❌ Ühendus ebaõnnestus';
+  document.getElementById('syncBar').className = 'sync-bar sync-err';
+});
+
+function render() {
+  const s26 = (currentData?.saunas2026 || []).sort((a,b) => a.date.localeCompare(b.date));
+  const s25 = DATA_2025.sort((a,b) => a.date.localeCompare(b.date));
+
+  const today = new Date().toISOString().split('T')[0];
+
+  // Scores
+  document.getElementById('score2026').textContent = s26.length;
+
+  // Pace: count 2025 entries up to same day-of-year
+  const todayMMDD = today.slice(5);
+  const s25upToToday = s25.filter(s => s.date.slice(5) <= todayMMDD);
+  document.getElementById('pace2026').textContent = s26.length + ' sauna';
+  document.getElementById('pace2025').textContent = s25upToToday.length + ' sauna';
+  const diff = s26.length - s25upToToday.length;
+  const diffEl = document.getElementById('paceDiff');
+  if (diff > 0) { diffEl.textContent = '+' + diff + ' ees'; diffEl.className = 'pace-diff ahead'; }
+  else if (diff < 0) { diffEl.textContent = diff + ' maas'; diffEl.className = 'pace-diff behind'; }
+  else { diffEl.textContent = '= võrdne'; diffEl.className = 'pace-diff equal'; }
+
+  // Home vs away
+  const home26 = s26.filter(s => s.type === 'home').length;
+  const away26 = s26.filter(s => s.type === 'away').length;
+  const total26 = s26.length || 1;
+  document.getElementById('cntHome').textContent = home26;
+  document.getElementById('cntAway').textContent = away26;
+  document.getElementById('barHome').style.width = Math.round(home26/total26*100) + '%';
+  document.getElementById('barAway').style.width = Math.round(away26/total26*100) + '%';
+  document.getElementById('splitPct').textContent = `${Math.round(home26/total26*100)}% kodus · ${Math.round(away26/total26*100)}% võõrsil`;
+
+  // Beers
+  const totalBeers = s26.reduce((a,s) => a+(s.beers||0), 0);
+  document.getElementById('beerTotal').textContent = totalBeers;
+  document.getElementById('beerAvg').textContent = s26.length ? (totalBeers/s26.length).toFixed(1) : '0';
+  document.getElementById('beerMax').textContent = (Math.max(0,...s26.map(s=>s.beers||0))) + ' ★';
+
+  // Away TOP
+  const awayCounts = {};
+  s26.filter(s => s.type==='away' && s.location).forEach(s => {
+    awayCounts[s.location] = (awayCounts[s.location]||0) + 1;
+  });
+  const topAway = Object.entries(awayCounts).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const topEl = document.getElementById('awayTop');
+  if (topAway.length === 0) {
+    topEl.innerHTML = '<li class="top-item" style="color:var(--muted)">Veel ei ole võõrsil saunu</li>';
+  } else {
+    topEl.innerHTML = topAway.map(([name,cnt],i) =>
+      `<li class="top-item">
+        <span class="top-rank">${i+1}</span>
+        <span class="top-name">${name}</span>
+        <span class="top-count">${cnt}×</span>
+      </li>`
+    ).join('');
+  }
+
+  // Per week
+  if (s26.length > 1) {
+    const first = new Date(s26[0].date);
+    const last = new Date(today);
+    const weeks = Math.max(1, (last-first)/(7*86400000));
+    document.getElementById('perWeek').textContent = (s26.length/weeks).toFixed(1);
+  }
+
+  // Longest gap
+  if (s26.length > 1) {
+    let maxGap = 0;
+    for (let i=1; i<s26.length; i++) {
+      const gap = (new Date(s26[i].date) - new Date(s26[i-1].date)) / 86400000;
+      if (gap > maxGap) maxGap = gap;
+    }
+    document.getElementById('longestStreak').textContent = Math.round(maxGap);
+  }
+
+  // Monthly chart
+  const months26 = {};
+  const months25 = {};
+  s26.forEach(s => { const m = parseInt(s.date.slice(5,7))-1; months26[m] = (months26[m]||0)+1; });
+  s25.forEach(s => { const m = parseInt(s.date.slice(5,7))-1; months25[m] = (months25[m]||0)+1; });
+  const maxM = Math.max(1, ...Object.values(months26), ...Object.values(months25));
+  const currentMonth = new Date().getMonth();
+  const chartEl = document.getElementById('monthChart');
+  chartEl.innerHTML = Array.from({length:12}, (_,m) => {
+    if (m > currentMonth + 1) return '';
+    const v26 = months26[m]||0;
+    const v25 = months25[m]||0;
+    return `<div class="month-row">
+      <div class="month-name">${MONTHS_ET[m]}</div>
+      <div class="month-bars">
+        <div class="month-bar-wrap">
+          <div class="month-track"><div class="month-fill-this" style="width:${v26/maxM*100}%"></div></div>
+          <div class="month-val this">${v26||''}</div>
+        </div>
+        <div class="month-bar-wrap">
+          <div class="month-track"><div class="month-fill-last" style="width:${v25/maxM*100}%"></div></div>
+          <div class="month-val last">${v25||''}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Log table
+  renderTable(viewYear === 2026 ? s26 : s25);
+}
+
+function renderTable(saunas) {
+  const sorted = [...saunas].reverse();
+  document.getElementById('logBody').innerHTML = sorted.length === 0
+    ? '<tr><td colspan="6" style="color:var(--muted);text-align:center;padding:24px">Veel ei ole kandeid</td></tr>'
+    : sorted.map((s, i) => {
+        const nr = sorted.length - i;
+        const beersStr = s.beers > 0 ? '★'.repeat(s.beers) : '—';
+        const deleteBtn = viewYear === 2026
+          ? `<button onclick="deleteSauna('${s.date}', '${s.type}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.9rem;padding:2px 6px;border-radius:6px;" title="Kustuta">✕</button>`
+          : '';
+        return `<tr>
+          <td style="color:var(--muted)">${nr}</td>
+          <td>${formatDate(s.date)}</td>
+          <td><span class="${s.type==='home'?'badge-home':'badge-away'}">${s.type==='home'?'Kodus':'Võõrsil'}</span></td>
+          <td style="color:var(--muted)">${s.location||'—'}</td>
+          <td class="beer-dots">${beersStr}</td>
+          <td>${deleteBtn}</td>
+        </tr>`;
+      }).join('');
+}
+
+function formatDate(str) {
+  const d = new Date(str);
+  return d.toLocaleDateString('et-EE', {day:'numeric', month:'short', year: str.startsWith('2025') ? 'numeric' : undefined});
+}
+
+window.showYear = function(year, btn) {
+  viewYear = year;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const s26 = (currentData?.saunas2026||[]).sort((a,b)=>a.date.localeCompare(b.date));
+  renderTable(year === 2026 ? s26 : DATA_2025);
+};
+
+window.addSauna = async function() {
+  const date = document.getElementById('newDate').value;
+  const type = document.getElementById('newType').value;
+  const location = document.getElementById('newLocation').value.trim();
+  const beers = parseInt(document.getElementById('newBeers').value) || 0;
+  if (!date) { alert('Vali kuupäev!'); return; }
+  const data = currentData ? JSON.parse(JSON.stringify(currentData)) : {};
+  const list = data.saunas2026 || [];
+  // Avoid exact duplicates
+  if (list.some(s => s.date === date && s.type === type)) {
+    if (!confirm('Sellel kuupäeval on juba ' + (type==='home'?'kodune':'võõrsil') + ' saun. Lisa ikkagi?')) return;
+  }
+  list.push({date, type, location: location || '', beers});
+  data.saunas2026 = list;
+  document.getElementById('syncBar').textContent = '⏳ Salvestab...';
+  await setDoc(saunaRef, data);
+  document.getElementById('newDate').value = '';
+  document.getElementById('newLocation').value = '';
+  document.getElementById('newBeers').value = '0';
+};
+
+window.deleteSauna = async function(date, type) {
+  if (!confirm('Kustuta see saun?')) return;
+  const data = currentData ? JSON.parse(JSON.stringify(currentData)) : {};
+  const list = data.saunas2026 || [];
+  const idx = list.findIndex(s => s.date === date && s.type === type);
+  if (idx >= 0) list.splice(idx, 1);
+  data.saunas2026 = list;
+  await setDoc(saunaRef, data);
+};
+
+// Set today's date as default
+document.getElementById('newDate').value = new Date().toISOString().split('T')[0];
+// Show/hide location based on type
+document.getElementById('newType').addEventListener('change', e => {
+  document.getElementById('locationGroup').style.opacity = e.target.value === 'away' ? '1' : '0.4';
+});
+</script>
+</body>
+</html>
