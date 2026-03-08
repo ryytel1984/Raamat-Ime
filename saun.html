@@ -433,6 +433,12 @@ tr:hover td { background: var(--surface2); }
           <option value="2">★★ (2)</option>
           <option value="3">★★★ (3)</option>
           <option value="4">★★★★ (4)</option>
+          <option value="5">★★★★★ (5)</option>
+          <option value="6">★★★★★★ (6)</option>
+          <option value="7">★★★★★★★ (7)</option>
+          <option value="8">★★★★★★★★ (8)</option>
+          <option value="9">★★★★★★★★★ (9)</option>
+          <option value="10">★★★★★★★★★★ (10)</option>
         </select>
       </div>
       <button class="btn-add" onclick="addSauna()">Lisa saun 🧖</button>
@@ -780,7 +786,26 @@ window.showYear = function(year, btn) {
   renderTable(year === 2026 ? s26 : DATA_2025);
 };
 
+// PIN — muuda seda oma salajaseks koodiks
+const SAUNA_PIN = "3793";
+let pinUnlocked = false;
+
+function checkPin() {
+  if (pinUnlocked) return true;
+  const pin = prompt("🔒 Sisesta PIN muudatuste tegemiseks:");
+  if (pin === null) return false;
+  if (pin === SAUNA_PIN) {
+    pinUnlocked = true;
+    // Unlock expires after 10 minutes
+    setTimeout(() => { pinUnlocked = false; }, 10 * 60 * 1000);
+    return true;
+  }
+  alert("Vale PIN! 🚫");
+  return false;
+}
+
 window.addSauna = async function() {
+  if (!checkPin()) return;
   const date = document.getElementById('newDate').value;
   const type = document.getElementById('newType').value;
   const location = document.getElementById('newLocation').value.trim();
@@ -788,7 +813,6 @@ window.addSauna = async function() {
   if (!date) { alert('Vali kuupäev!'); return; }
   const data = currentData ? JSON.parse(JSON.stringify(currentData)) : {};
   const list = data.saunas2026 || [];
-  // Avoid exact duplicates
   if (list.some(s => s.date === date && s.type === type)) {
     if (!confirm('Sellel kuupäeval on juba ' + (type==='home'?'kodune':'võõrsil') + ' saun. Lisa ikkagi?')) return;
   }
@@ -802,6 +826,7 @@ window.addSauna = async function() {
 };
 
 window.deleteSauna = async function(date, type) {
+  if (!checkPin()) return;
   if (!confirm('Kustuta see saun?')) return;
   const data = currentData ? JSON.parse(JSON.stringify(currentData)) : {};
   const list = data.saunas2026 || [];
