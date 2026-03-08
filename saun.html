@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🧖 Sauna Log</title>
+<title>🧖 Saunapäevik</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -302,7 +302,7 @@ tr:hover td { background: var(--surface2); }
 
 <header>
   <span class="header-emoji">🧖</span>
-  <h1>Sauna Log</h1>
+  <h1>Saunapäevik</h1>
   <div class="sync-bar" id="syncBar">⏳ Ühendun...</div>
 </header>
 
@@ -372,10 +372,18 @@ tr:hover td { background: var(--surface2); }
     </div>
   </div>
 
-  <!-- Away TOP -->
+  <!-- Away TOP 2026 -->
   <div class="card">
     <div class="card-title">📍 Võõrsil TOP (2026)</div>
     <ul class="top-list" id="awayTop">
+      <li class="top-item" style="color:var(--muted);font-size:0.85rem">Andmed laadivad...</li>
+    </ul>
+  </div>
+
+  <!-- Away TOP 2025 -->
+  <div class="card">
+    <div class="card-title" style="color:var(--away2)">📍 Võõrsil TOP (2025)</div>
+    <ul class="top-list" id="awayTop2025">
       <li class="top-item" style="color:var(--muted);font-size:0.85rem">Andmed laadivad...</li>
     </ul>
   </div>
@@ -690,7 +698,7 @@ function render() {
   document.getElementById('beerAvg').textContent = s26.length ? (totalBeers/s26.length).toFixed(1) : '0';
   document.getElementById('beerMax').textContent = (Math.max(0,...s26.map(s=>s.beers||0))) + ' ★';
 
-  // Away TOP
+  // Away TOP 2026
   const awayCounts = {};
   s26.filter(s => s.type==='away' && s.location).forEach(s => {
     awayCounts[s.location] = (awayCounts[s.location]||0) + 1;
@@ -708,6 +716,21 @@ function render() {
       </li>`
     ).join('');
   }
+
+  // Away TOP 2025
+  const awayCounts25 = {};
+  s25.filter(s => s.type==='away' && s.location).forEach(s => {
+    awayCounts25[s.location] = (awayCounts25[s.location]||0) + 1;
+  });
+  const topAway25 = Object.entries(awayCounts25).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const topEl25 = document.getElementById('awayTop2025');
+  topEl25.innerHTML = topAway25.map(([name,cnt],i) =>
+    `<li class="top-item">
+      <span class="top-rank" style="color:var(--away2)">${i+1}</span>
+      <span class="top-name">${name}</span>
+      <span class="top-count" style="color:var(--away2)">${cnt}×</span>
+    </li>`
+  ).join('');
 
   // Per week
   if (s26.length > 1) {
