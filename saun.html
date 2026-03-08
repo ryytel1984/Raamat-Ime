@@ -315,7 +315,7 @@ tr:hover td { background: var(--surface2); }
   </div>
   <div class="score-card last-year">
     <div class="score-year">2025</div>
-    <div class="score-num">110</div>
+    <div class="score-num" id="score2025">—</div>
     <div class="score-sub">sauna kokku</div>
   </div>
 </div>
@@ -661,6 +661,7 @@ function render() {
 
   // Scores
   document.getElementById('score2026').textContent = s26.length;
+  document.getElementById('score2025').textContent = s25.length;
 
   // Pace: count 2025 entries up to same day-of-year
   const todayMMDD = today.slice(5);
