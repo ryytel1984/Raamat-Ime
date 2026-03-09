@@ -426,8 +426,12 @@ tr:hover td { background: var(--surface2); }
   </div>
 </div>
 
-<!-- Add new sauna -->
+<!-- Add button + hidden form -->
 <div class="add-section">
+  <div style="text-align:center;margin-bottom:16px">
+    <button onclick="toggleAddForm()" id="toggleAddBtn" style="font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:600;padding:12px 32px;background:transparent;color:var(--ember);border:2px solid var(--ember);border-radius:50px;cursor:pointer;transition:all 0.2s" onmouseover="this.style.background='rgba(232,84,10,0.1)'" onmouseout="this.style.background='transparent'">➕ Lisa / Muuda</button>
+  </div>
+  <div id="addFormWrap" style="display:none">
   <div class="add-card">
     <div class="add-title">➕ Lisa uus saun</div>
     <div class="form-row">
@@ -492,6 +496,7 @@ tr:hover td { background: var(--surface2); }
       <button class="btn-add" onclick="addSauna()">Lisa saun 🧖</button>
     </div>
   </div>
+  </div><!-- /addFormWrap -->
 </div>
 
 <!-- Log table -->
@@ -940,7 +945,7 @@ function renderTable(saunas) {
         const companionsStr = s.companions && s.companions.length > 0
           ? s.companions.map(c => `<span style="background:rgba(201,151,58,0.15);color:var(--gold);padding:2px 8px;border-radius:50px;font-size:0.75rem;font-weight:600">${c}</span>`).join(' ')
           : '—';
-        const deleteBtn = viewYear === 2026
+        const deleteBtn = (viewYear === 2026 && adminMode)
           ? `<button onclick="deleteSauna('${s.date}', '${s.type}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.9rem;padding:2px 6px;border-radius:6px;" title="Kustuta">✕</button>
              <button onclick="openEdit('${s.date}', '${s.type}')" style="background:none;border:none;color:var(--ember);cursor:pointer;font-size:0.9rem;padding:2px 6px;border-radius:6px;" title="Muuda">✏️</button>`
           : '';
@@ -1024,7 +1029,29 @@ window.addSauna = async function() {
   renderCompanionTags();
 };
 
-// ── COMPANIONS AUTOCOMPLETE ──
+// ── ADMIN MODE ──
+let adminMode = false;
+
+window.toggleAddForm = function() {
+  if (!adminMode) {
+    if (!checkPin()) return;
+    adminMode = true;
+    document.getElementById('toggleAddBtn').textContent = '🔒 Sulge muutmisrežiim';
+    document.getElementById('toggleAddBtn').style.color = 'var(--muted)';
+    document.getElementById('toggleAddBtn').style.borderColor = 'var(--border)';
+  } else {
+    adminMode = false;
+    document.getElementById('toggleAddBtn').textContent = '➕ Lisa / Muuda';
+    document.getElementById('toggleAddBtn').style.color = 'var(--ember)';
+    document.getElementById('toggleAddBtn').style.borderColor = 'var(--ember)';
+    document.getElementById('addFormWrap').style.display = 'none';
+    pinUnlocked = false;
+  }
+  document.getElementById('addFormWrap').style.display = adminMode ? 'block' : 'none';
+  // Re-render table to show/hide edit buttons
+  const s26 = (currentData?.saunas2026||[]).sort((a,b)=>a.date.localeCompare(b.date));
+  renderTable(viewYear === 2026 ? s26 : DATA_2025);
+};
 let selectedCompanions = [];
 
 function renderCompanionTags() {
