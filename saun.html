@@ -256,7 +256,29 @@ tr:hover td { background: var(--surface2); }
   border-radius: 20px;
   padding: 24px;
 }
-.add-title { font-size: 0.75rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+.pin-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  color: var(--text);
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+  aspect-ratio: 1;
+}
+.pin-btn:active { transform: scale(0.92); background: var(--ember); border-color: var(--ember); }
+.pin-dot {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: transparent;
+  transition: all 0.2s;
+}
+.pin-dot.filled { background: var(--ember); border-color: var(--ember); }
+.pin-dot.error { background: #e84a4a; border-color: #e84a4a; } font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: end; }
 .form-group { display: flex; flex-direction: column; gap: 6px; }
 .form-label { font-size: 0.75rem; color: var(--muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
@@ -497,6 +519,37 @@ tr:hover td { background: var(--surface2); }
     </div>
   </div>
   </div><!-- /addFormWrap -->
+</div>
+
+<!-- PIN modal -->
+<div id="pinModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:300;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:28px;padding:36px 28px;max-width:320px;width:100%;text-align:center;">
+    <div style="font-size:2rem;margin-bottom:8px">🔒</div>
+    <div style="font-size:0.75rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:24px">Sisesta PIN</div>
+    <!-- PIN dots -->
+    <div style="display:flex;justify-content:center;gap:16px;margin-bottom:32px">
+      <div class="pin-dot" id="pd0"></div>
+      <div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div>
+      <div class="pin-dot" id="pd3"></div>
+    </div>
+    <!-- Numpad -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:240px;margin:0 auto">
+      <button class="pin-btn" onclick="pinPress('1')">1</button>
+      <button class="pin-btn" onclick="pinPress('2')">2</button>
+      <button class="pin-btn" onclick="pinPress('3')">3</button>
+      <button class="pin-btn" onclick="pinPress('4')">4</button>
+      <button class="pin-btn" onclick="pinPress('5')">5</button>
+      <button class="pin-btn" onclick="pinPress('6')">6</button>
+      <button class="pin-btn" onclick="pinPress('7')">7</button>
+      <button class="pin-btn" onclick="pinPress('8')">8</button>
+      <button class="pin-btn" onclick="pinPress('9')">9</button>
+      <button class="pin-btn" onclick="pinCancel()" style="background:transparent;color:var(--muted);font-size:1rem">Tühista</button>
+      <button class="pin-btn" onclick="pinPress('0')">0</button>
+      <button class="pin-btn" onclick="pinBackspace()" style="font-size:1.2rem">⌫</button>
+    </div>
+    <div id="pinError" style="color:#e84a4a;font-size:0.82rem;margin-top:16px;min-height:20px"></div>
+  </div>
 </div>
 
 <!-- Log table -->
@@ -975,26 +1028,69 @@ window.showYear = function(year, btn) {
   renderTable(year === 2026 ? s26 : DATA_2025);
 };
 
-// PIN — muuda seda oma salajaseks koodiks
+// ── PIN MODAL ──
 const SAUNA_PIN = "3793";
 let pinUnlocked = false;
+let pinBuffer = '';
+let pinResolve = null;
 
 function checkPin() {
-  if (pinUnlocked) return true;
-  const pin = prompt("🔒 Sisesta PIN muudatuste tegemiseks:");
-  if (pin === null) return false;
-  if (pin === SAUNA_PIN) {
-    pinUnlocked = true;
-    // Unlock expires after 10 minutes
-    setTimeout(() => { pinUnlocked = false; }, 10 * 60 * 1000);
-    return true;
+  if (pinUnlocked) return Promise.resolve(true);
+  return new Promise(resolve => {
+    pinResolve = resolve;
+    pinBuffer = '';
+    updatePinDots();
+    document.getElementById('pinError').textContent = '';
+    document.getElementById('pinModal').style.display = 'flex';
+  });
+}
+
+window.pinPress = function(digit) {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += digit;
+  updatePinDots();
+  if (pinBuffer.length === 4) {
+    setTimeout(() => {
+      if (pinBuffer === SAUNA_PIN) {
+        pinUnlocked = true;
+        setTimeout(() => { pinUnlocked = false; }, 10 * 60 * 1000);
+        document.getElementById('pinModal').style.display = 'none';
+        pinResolve && pinResolve(true);
+      } else {
+        // Shake + error
+        document.querySelectorAll('.pin-dot').forEach(d => { d.classList.remove('filled'); d.classList.add('error'); });
+        document.getElementById('pinError').textContent = 'Vale PIN! Proovi uuesti.';
+        setTimeout(() => {
+          pinBuffer = '';
+          updatePinDots();
+          document.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('error'));
+        }, 800);
+      }
+    }, 100);
   }
-  alert("Vale PIN! 🚫");
-  return false;
+};
+
+window.pinBackspace = function() {
+  pinBuffer = pinBuffer.slice(0, -1);
+  updatePinDots();
+};
+
+window.pinCancel = function() {
+  document.getElementById('pinModal').style.display = 'none';
+  pinBuffer = '';
+  updatePinDots();
+  pinResolve && pinResolve(false);
+};
+
+function updatePinDots() {
+  for (let i = 0; i < 4; i++) {
+    const d = document.getElementById('pd' + i);
+    d.classList.toggle('filled', i < pinBuffer.length);
+  }
 }
 
 window.addSauna = async function() {
-  if (!checkPin()) return;
+  if (!await checkPin()) return;
   const date = document.getElementById('newDate').value;
   const type = document.getElementById('newType').value;
   const location = document.getElementById('newLocation').value.trim();
@@ -1032,9 +1128,9 @@ window.addSauna = async function() {
 // ── ADMIN MODE ──
 let adminMode = false;
 
-window.toggleAddForm = function() {
+window.toggleAddForm = async function() {
   if (!adminMode) {
-    if (!checkPin()) return;
+    if (!await checkPin()) return;
     adminMode = true;
     document.getElementById('toggleAddBtn').textContent = '🔒 Sulge muutmisrežiim';
     document.getElementById('toggleAddBtn').style.color = 'var(--muted)';
@@ -1117,7 +1213,7 @@ document.addEventListener('click', function(e) {
 });
 
 window.deleteSauna = async function(date, type) {
-  if (!checkPin()) return;
+  if (!await checkPin()) return;
   if (!confirm('Kustuta see saun?')) return;
   const data = currentData ? JSON.parse(JSON.stringify(currentData)) : {};
   const list = data.saunas2026 || [];
@@ -1137,8 +1233,8 @@ window.toggleEditLocation = function() {
   if (type === 'home') document.getElementById('editLocation').value = '';
 };
 
-window.openEdit = function(date, type) {
-  if (!checkPin()) return;
+window.openEdit = async function(date, type) {
+  if (!await checkPin()) return;
   const list = currentData?.saunas2026 || [];
   const s = list.find(x => x.date === date && x.type === type);
   if (!s) return;
