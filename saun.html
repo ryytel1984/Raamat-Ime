@@ -389,13 +389,25 @@ tr:hover td { background: var(--surface2); }
     </ul>
   </div>
 
-  <!-- Per week -->
+  <!-- Companions TOP -->
   <div class="card">
-    <div class="card-title">📅 Tempo</div>
+    <div class="card-title">👥 Kaaslased TOP (2026)</div>
+    <ul class="top-list" id="companionsTop">
+      <li class="top-item" style="color:var(--muted);font-size:0.85rem">Andmed laadivad...</li>
+    </ul>
+  </div>
+
+  <!-- Per week + leilis -->
+  <div class="card">
+    <div class="card-title">📅 Tempo & Leilid</div>
     <div class="stat-big" id="perWeek">—</div>
     <div class="stat-sub">sauna nädalas (2026 keskmine)</div>
     <div style="margin-top:16px">
-      <div class="stat-big" style="font-size:2rem;color:var(--gold)" id="longestStreak">—</div>
+      <div class="stat-big" style="font-size:2rem;color:var(--gold)" id="avgLeilis">—</div>
+      <div class="stat-sub">leili keskmiselt sauna kohta</div>
+    </div>
+    <div style="margin-top:16px">
+      <div class="stat-big" style="font-size:2rem;color:var(--muted)" id="longestStreak">—</div>
       <div class="stat-sub">päeva pikim vahe saunade vahel</div>
     </div>
   </div>
@@ -432,7 +444,26 @@ tr:hover td { background: var(--surface2); }
       </div>
       <div class="form-group full" id="locationGroup">
         <label class="form-label">Koht</label>
-        <input type="text" class="form-input" id="newLocation" placeholder="nt Viimsi spa">
+        <div style="position:relative">
+          <input type="text" class="form-input" id="newLocation" placeholder="nt Viimsi spa" autocomplete="off">
+          <div id="locationSuggest" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:10px;z-index:10;margin-top:4px;overflow:hidden;"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Leilid 🌊</label>
+        <select class="form-input form-select" id="newLeilis">
+          <option value="0">—</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+        </select>
       </div>
       <div class="form-group">
         <label class="form-label">Õlled 🍺</label>
@@ -449,6 +480,14 @@ tr:hover td { background: var(--surface2); }
           <option value="9">★★★★★★★★★ (9)</option>
           <option value="10">★★★★★★★★★★ (10)</option>
         </select>
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Kaaslased 👥</label>
+        <div style="position:relative">
+          <input type="text" class="form-input" id="newCompanions" placeholder="Ira, Ott, Madis..." autocomplete="off">
+          <div id="companionsSuggest" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:10px;z-index:10;margin-top:4px;overflow:hidden;"></div>
+        </div>
+        <div id="companionTags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;"></div>
       </div>
       <button class="btn-add" onclick="addSauna()">Lisa saun 🧖</button>
     </div>
@@ -470,7 +509,9 @@ tr:hover td { background: var(--surface2); }
           <th>Kuupäev</th>
           <th>Tüüp</th>
           <th>Koht</th>
+          <th>Leilid</th>
           <th>Õlled</th>
+          <th>Kaaslased</th>
           <th></th>
         </tr>
       </thead>
@@ -478,6 +519,58 @@ tr:hover td { background: var(--surface2); }
         <tr><td colspan="6" style="color:var(--muted);text-align:center;padding:24px">Laen...</td></tr>
       </tbody>
     </table>
+  </div>
+</div>
+
+<!-- Edit modal -->
+<div id="editModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:28px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;">
+    <div style="font-size:0.75rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:16px">✏️ MUUDA KANNET</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Kuupäev</label>
+        <input type="date" class="form-input" id="editDate">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tüüp</label>
+        <select class="form-input" id="editType">
+          <option value="home">Kodus</option>
+          <option value="away">Võõrsil</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Koht</label>
+        <input type="text" class="form-input" id="editLocation" placeholder="nt Viimsi spa">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Leilid 🌊</label>
+        <select class="form-input" id="editLeilis">
+          <option value="0">—</option>
+          ${Array.from({length:10},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Õlled 🍺</label>
+        <select class="form-input" id="editBeers">
+          <option value="0">—</option>
+          ${Array.from({length:10},(_,i)=>`<option value="${i+1}">${'★'.repeat(i+1)} (${i+1})</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Kaaslased 👥</label>
+        <div style="position:relative">
+          <input type="text" class="form-input" id="editCompanions" placeholder="Kirjuta nimi + Enter" autocomplete="off">
+          <div id="editCompanionsSuggest" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:10px;z-index:10;margin-top:4px;overflow:hidden;"></div>
+        </div>
+        <div id="editCompanionTags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;"></div>
+      </div>
+    </div>
+    <input type="hidden" id="editOrigDate">
+    <input type="hidden" id="editOrigType">
+    <div style="display:flex;gap:10px;margin-top:20px;">
+      <button class="btn-add" style="flex:1" onclick="saveEdit()">💾 Salvesta</button>
+      <button onclick="closeEdit()" style="flex:1;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:600;padding:11px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:10px;cursor:pointer;">Tühista</button>
+    </div>
   </div>
 </div>
 
@@ -649,6 +742,14 @@ let viewYear = 2026;
 onSnapshot(saunaRef, snap => {
   if (snap.exists()) {
     currentData = snap.data();
+    // Seed known locations from existing away saunas if not yet present
+    if (!currentData.knownLocations) {
+      const locs = [...new Set((currentData.saunas2026||[]).filter(s=>s.type==='away'&&s.location).map(s=>s.location))];
+      if (locs.length > 0) {
+        currentData.knownLocations = locs;
+        setDoc(saunaRef, currentData);
+      }
+    }
   } else {
     // First time — seed with initial 2026 data
     currentData = { saunas2026: INITIAL_2026 };
@@ -741,6 +842,34 @@ function render() {
     document.getElementById('perWeek').textContent = (s26.length/weeks).toFixed(1);
   }
 
+  // Avg leilis
+  const leilisEntries = s26.filter(s => s.leilis > 0);
+  if (leilisEntries.length > 0) {
+    const avg = (leilisEntries.reduce((a,s) => a+(s.leilis||0), 0) / leilisEntries.length).toFixed(1);
+    document.getElementById('avgLeilis').textContent = avg;
+  } else {
+    document.getElementById('avgLeilis').textContent = '—';
+  }
+
+  // Companions TOP
+  const compCounts = {};
+  s26.forEach(s => (s.companions||[]).forEach(c => {
+    compCounts[c] = (compCounts[c]||0) + 1;
+  }));
+  const topComp = Object.entries(compCounts).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const compEl = document.getElementById('companionsTop');
+  if (topComp.length === 0) {
+    compEl.innerHTML = '<li class="top-item" style="color:var(--muted)">Veel pole kaaslasi lisatud</li>';
+  } else {
+    compEl.innerHTML = topComp.map(([name,cnt],i) =>
+      `<li class="top-item">
+        <span class="top-rank" style="color:var(--gold)">${i+1}</span>
+        <span class="top-name">${name}</span>
+        <span class="top-count" style="color:var(--gold)">${cnt}×</span>
+      </li>`
+    ).join('');
+  }
+
   // Longest gap
   if (s26.length > 1) {
     let maxGap = 0;
@@ -785,19 +914,26 @@ function render() {
 function renderTable(saunas) {
   const sorted = [...saunas].reverse();
   document.getElementById('logBody').innerHTML = sorted.length === 0
-    ? '<tr><td colspan="6" style="color:var(--muted);text-align:center;padding:24px">Veel ei ole kandeid</td></tr>'
+    ? '<tr><td colspan="8" style="color:var(--muted);text-align:center;padding:24px">Veel ei ole kandeid</td></tr>'
     : sorted.map((s, i) => {
         const nr = sorted.length - i;
         const beersStr = s.beers > 0 ? '★'.repeat(s.beers) : '—';
+        const leilisStr = s.leilis > 0 ? s.leilis : '—';
+        const companionsStr = s.companions && s.companions.length > 0
+          ? s.companions.map(c => `<span style="background:rgba(201,151,58,0.15);color:var(--gold);padding:2px 8px;border-radius:50px;font-size:0.75rem;font-weight:600">${c}</span>`).join(' ')
+          : '—';
         const deleteBtn = viewYear === 2026
-          ? `<button onclick="deleteSauna('${s.date}', '${s.type}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.9rem;padding:2px 6px;border-radius:6px;" title="Kustuta">✕</button>`
+          ? `<button onclick="deleteSauna('${s.date}', '${s.type}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.9rem;padding:2px 6px;border-radius:6px;" title="Kustuta">✕</button>
+             <button onclick="openEdit('${s.date}', '${s.type}')" style="background:none;border:none;color:var(--ember);cursor:pointer;font-size:0.9rem;padding:2px 6px;border-radius:6px;" title="Muuda">✏️</button>`
           : '';
         return `<tr>
           <td style="color:var(--muted)">${nr}</td>
           <td>${formatDate(s.date)}</td>
           <td><span class="${s.type==='home'?'badge-home':'badge-away'}">${s.type==='home'?'Kodus':'Võõrsil'}</span></td>
           <td style="color:var(--muted)">${s.location||'—'}</td>
+          <td style="color:var(--steam);font-weight:600">${leilisStr}</td>
           <td class="beer-dots">${beersStr}</td>
+          <td>${companionsStr}</td>
           <td>${deleteBtn}</td>
         </tr>`;
       }).join('');
@@ -840,20 +976,100 @@ window.addSauna = async function() {
   const type = document.getElementById('newType').value;
   const location = document.getElementById('newLocation').value.trim();
   const beers = parseInt(document.getElementById('newBeers').value) || 0;
+  const leilis = parseInt(document.getElementById('newLeilis').value) || 0;
+  const companions = selectedCompanions.slice();
   if (!date) { alert('Vali kuupäev!'); return; }
   const data = currentData ? JSON.parse(JSON.stringify(currentData)) : {};
   const list = data.saunas2026 || [];
   if (list.some(s => s.date === date && s.type === type)) {
     if (!confirm('Sellel kuupäeval on juba ' + (type==='home'?'kodune':'võõrsil') + ' saun. Lisa ikkagi?')) return;
   }
-  list.push({date, type, location: location || '', beers});
+  list.push({date, type, location: location || '', beers, leilis, companions});
   data.saunas2026 = list;
+  // Save known companions
+  const known = data.knownCompanions || [];
+  companions.forEach(c => { if (!known.includes(c)) known.push(c); });
+  data.knownCompanions = known;
+  // Save known locations
+  if (location && type === 'away') {
+    const knownLoc = data.knownLocations || [];
+    if (!knownLoc.includes(location)) knownLoc.push(location);
+    data.knownLocations = knownLoc;
+  }
   document.getElementById('syncBar').textContent = '⏳ Salvestab...';
   await setDoc(saunaRef, data);
   document.getElementById('newDate').value = '';
   document.getElementById('newLocation').value = '';
   document.getElementById('newBeers').value = '0';
+  document.getElementById('newLeilis').value = '0';
+  selectedCompanions = [];
+  renderCompanionTags();
 };
+
+// ── COMPANIONS AUTOCOMPLETE ──
+let selectedCompanions = [];
+
+function renderCompanionTags() {
+  const el = document.getElementById('companionTags');
+  el.innerHTML = selectedCompanions.map(c =>
+    `<span style="background:rgba(201,151,58,0.2);color:var(--gold);padding:4px 10px;border-radius:50px;font-size:0.82rem;font-weight:600;cursor:pointer" onclick="removeCompanion('${c}')">${c} ✕</span>`
+  ).join('');
+}
+
+window.removeCompanion = function(name) {
+  selectedCompanions = selectedCompanions.filter(c => c !== name);
+  renderCompanionTags();
+};
+
+function addCompanion(name) {
+  const n = name.trim();
+  if (!n || selectedCompanions.includes(n)) return;
+  selectedCompanions.push(n);
+  document.getElementById('newCompanions').value = '';
+  document.getElementById('companionsSuggest').style.display = 'none';
+  renderCompanionTags();
+}
+
+document.getElementById('newCompanions').addEventListener('input', function() {
+  const val = this.value.trim().toLowerCase();
+  const known = currentData?.knownCompanions || [];
+  const suggest = document.getElementById('companionsSuggest');
+  if (!val) { suggest.style.display = 'none'; return; }
+  const matches = known.filter(c => c.toLowerCase().includes(val) && !selectedCompanions.includes(c));
+  if (matches.length === 0) { suggest.style.display = 'none'; return; }
+  suggest.style.display = 'block';
+  suggest.innerHTML = matches.map(c =>
+    `<div onclick="addCompanion('${c}')" style="padding:10px 14px;cursor:pointer;font-size:0.9rem;border-bottom:1px solid var(--border);transition:background 0.15s" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background=''">${c}</div>`
+  ).join('');
+});
+
+document.getElementById('newCompanions').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && this.value.trim()) {
+    e.preventDefault();
+    addCompanion(this.value.trim());
+  }
+});
+
+// ── LOCATION AUTOCOMPLETE ──
+document.getElementById('newLocation').addEventListener('input', function() {
+  const val = this.value.trim().toLowerCase();
+  const known = currentData?.knownLocations || [];
+  const suggest = document.getElementById('locationSuggest');
+  if (!val) { suggest.style.display = 'none'; return; }
+  const matches = known.filter(l => l.toLowerCase().includes(val));
+  if (matches.length === 0) { suggest.style.display = 'none'; return; }
+  suggest.style.display = 'block';
+  suggest.innerHTML = matches.map(l =>
+    `<div onclick="document.getElementById('newLocation').value='${l}';document.getElementById('locationSuggest').style.display='none'" style="padding:10px 14px;cursor:pointer;font-size:0.9rem;border-bottom:1px solid var(--border);transition:background 0.15s" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background=''">${l}</div>`
+  ).join('');
+});
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#newLocation') && !e.target.closest('#locationSuggest')) {
+    const s = document.getElementById('locationSuggest');
+    if (s) s.style.display = 'none';
+  }
+});
 
 window.deleteSauna = async function(date, type) {
   if (!checkPin()) return;
@@ -864,6 +1080,99 @@ window.deleteSauna = async function(date, type) {
   if (idx >= 0) list.splice(idx, 1);
   data.saunas2026 = list;
   await setDoc(saunaRef, data);
+};
+
+let editCompanions = [];
+
+window.openEdit = function(date, type) {
+  if (!checkPin()) return;
+  const list = currentData?.saunas2026 || [];
+  const s = list.find(x => x.date === date && x.type === type);
+  if (!s) return;
+  document.getElementById('editDate').value = s.date;
+  document.getElementById('editType').value = s.type;
+  document.getElementById('editLocation').value = s.location || '';
+  document.getElementById('editLeilis').value = s.leilis || 0;
+  document.getElementById('editBeers').value = s.beers || 0;
+  document.getElementById('editOrigDate').value = s.date;
+  document.getElementById('editOrigType').value = s.type;
+  editCompanions = (s.companions || []).slice();
+  renderEditTags();
+  document.getElementById('editModal').style.display = 'flex';
+};
+
+window.closeEdit = function() {
+  document.getElementById('editModal').style.display = 'none';
+};
+
+window.saveEdit = async function() {
+  const origDate = document.getElementById('editOrigDate').value;
+  const origType = document.getElementById('editOrigType').value;
+  const date = document.getElementById('editDate').value;
+  const type = document.getElementById('editType').value;
+  const location = document.getElementById('editLocation').value.trim();
+  const leilis = parseInt(document.getElementById('editLeilis').value) || 0;
+  const beers = parseInt(document.getElementById('editBeers').value) || 0;
+  const companions = editCompanions.slice();
+  if (!date) { alert('Vali kuupäev!'); return; }
+  const data = currentData ? JSON.parse(JSON.stringify(currentData)) : {};
+  const list = data.saunas2026 || [];
+  const idx = list.findIndex(s => s.date === origDate && s.type === origType);
+  if (idx < 0) { alert('Kannet ei leitud!'); return; }
+  list[idx] = {date, type, location, leilis, beers, companions};
+  data.saunas2026 = list;
+  // Save known companions & locations
+  const known = data.knownCompanions || [];
+  companions.forEach(c => { if (!known.includes(c)) known.push(c); });
+  data.knownCompanions = known;
+  if (location && type === 'away') {
+    const knownLoc = data.knownLocations || [];
+    if (!knownLoc.includes(location)) knownLoc.push(location);
+    data.knownLocations = knownLoc;
+  }
+  document.getElementById('syncBar').textContent = '⏳ Salvestab...';
+  await setDoc(saunaRef, data);
+  closeEdit();
+};
+
+function renderEditTags() {
+  document.getElementById('editCompanionTags').innerHTML = editCompanions.map(c =>
+    `<span style="background:rgba(201,151,58,0.2);color:var(--gold);padding:4px 10px;border-radius:50px;font-size:0.82rem;font-weight:600;cursor:pointer" onclick="removeEditCompanion('${c}')">${c} ✕</span>`
+  ).join('');
+}
+
+window.removeEditCompanion = function(name) {
+  editCompanions = editCompanions.filter(c => c !== name);
+  renderEditTags();
+};
+
+document.getElementById('editCompanions').addEventListener('input', function() {
+  const val = this.value.trim().toLowerCase();
+  const known = currentData?.knownCompanions || [];
+  const suggest = document.getElementById('editCompanionsSuggest');
+  if (!val) { suggest.style.display = 'none'; return; }
+  const matches = known.filter(c => c.toLowerCase().includes(val) && !editCompanions.includes(c));
+  if (!matches.length) { suggest.style.display = 'none'; return; }
+  suggest.style.display = 'block';
+  suggest.innerHTML = matches.map(c =>
+    `<div onclick="addEditCompanion('${c}')" style="padding:10px 14px;cursor:pointer;font-size:0.9rem;border-bottom:1px solid var(--border)" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background=''">${c}</div>`
+  ).join('');
+});
+
+document.getElementById('editCompanions').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && this.value.trim()) {
+    e.preventDefault();
+    addEditCompanion(this.value.trim());
+  }
+});
+
+window.addEditCompanion = function(name) {
+  const n = name.trim();
+  if (!n || editCompanions.includes(n)) return;
+  editCompanions.push(n);
+  document.getElementById('editCompanions').value = '';
+  document.getElementById('editCompanionsSuggest').style.display = 'none';
+  renderEditTags();
 };
 
 // Set today's date as default
