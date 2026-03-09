@@ -533,12 +533,12 @@ tr:hover td { background: var(--surface2); }
       </div>
       <div class="form-group">
         <label class="form-label">Tüüp</label>
-        <select class="form-input" id="editType">
+        <select class="form-input" id="editType" onchange="toggleEditLocation()">
           <option value="home">Kodus</option>
           <option value="away">Võõrsil</option>
         </select>
       </div>
-      <div class="form-group full">
+      <div class="form-group full" id="editLocationGroup">
         <label class="form-label">Koht</label>
         <input type="text" class="form-input" id="editLocation" placeholder="nt Viimsi spa">
       </div>
@@ -546,14 +546,32 @@ tr:hover td { background: var(--surface2); }
         <label class="form-label">Leilid 🌊</label>
         <select class="form-input" id="editLeilis">
           <option value="0">—</option>
-          ${Array.from({length:10},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('')}
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
         </select>
       </div>
       <div class="form-group">
         <label class="form-label">Õlled 🍺</label>
         <select class="form-input" id="editBeers">
           <option value="0">—</option>
-          ${Array.from({length:10},(_,i)=>`<option value="${i+1}">${'★'.repeat(i+1)} (${i+1})</option>`).join('')}
+          <option value="1">★ (1)</option>
+          <option value="2">★★ (2)</option>
+          <option value="3">★★★ (3)</option>
+          <option value="4">★★★★ (4)</option>
+          <option value="5">★★★★★ (5)</option>
+          <option value="6">★★★★★★ (6)</option>
+          <option value="7">★★★★★★★ (7)</option>
+          <option value="8">★★★★★★★★ (8)</option>
+          <option value="9">★★★★★★★★★ (9)</option>
+          <option value="10">★★★★★★★★★★ (10)</option>
         </select>
       </div>
       <div class="form-group full">
@@ -1084,6 +1102,14 @@ window.deleteSauna = async function(date, type) {
 
 let editCompanions = [];
 
+window.toggleEditLocation = function() {
+  const type = document.getElementById('editType').value;
+  const grp = document.getElementById('editLocationGroup');
+  grp.style.opacity = type === 'away' ? '1' : '0.3';
+  grp.style.pointerEvents = type === 'away' ? 'auto' : 'none';
+  if (type === 'home') document.getElementById('editLocation').value = '';
+};
+
 window.openEdit = function(date, type) {
   if (!checkPin()) return;
   const list = currentData?.saunas2026 || [];
@@ -1098,6 +1124,7 @@ window.openEdit = function(date, type) {
   document.getElementById('editOrigType').value = s.type;
   editCompanions = (s.companions || []).slice();
   renderEditTags();
+  toggleEditLocation();
   document.getElementById('editModal').style.display = 'flex';
 };
 
